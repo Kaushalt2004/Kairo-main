@@ -1,3 +1,0 @@
-<library path="modules/prediction_plugin/multi_agent_pedestrian_tensorrt/libmodel.so">
-    <class type="apollo::prediction::MultiAgentPedestrianTensorrt" base_class="apollo::prediction::ModelBase"></class>
-</library>

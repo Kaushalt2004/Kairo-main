@@ -1,3 +1,0 @@
-<library path="modules/prediction_plugin/semantic_lstm_pedestrian_tensorrt/libmodel.so">
-    <class type="apollo::prediction::SemanticLstmPedestrianTensorrt" base_class="apollo::prediction::ModelBase"></class>
-</library>

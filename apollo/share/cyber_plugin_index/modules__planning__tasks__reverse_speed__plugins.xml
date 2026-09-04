@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/reverse_speed/libreverse_speed.so">
-    <class type="apollo::planning::ReverseSpeed" base_class="apollo::planning::Task"></class>
-</library>

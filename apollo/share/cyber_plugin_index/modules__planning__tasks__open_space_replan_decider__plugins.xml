@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/open_space_replan_decider/libopen_space_replan_decider.so">
-    <class type="apollo::planning::OpenSpaceReplanDecider" base_class="apollo::planning::Task"></class>
-</library>

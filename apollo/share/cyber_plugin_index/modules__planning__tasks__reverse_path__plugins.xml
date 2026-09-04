@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/reverse_path/libreverse_path.so">
-    <class type="apollo::planning::ReversePath" base_class="apollo::planning::Task"></class>
-</library>

@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/square_path/libsquare_path.so">
-    <class type="apollo::planning::SquarePath" base_class="apollo::planning::Task"></class>
-</library>

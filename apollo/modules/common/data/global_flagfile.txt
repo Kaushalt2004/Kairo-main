@@ -53,3 +53,7 @@
 --map_dir=/apollo/modules/map/data/carla_town01
 
 --map_dir=/apollo/modules/map/data/carla_town03
+
+--map_dir=/apollo/modules/map/data/carla_town02
+
+--map_dir=/apollo/modules/map/data/carla_town03

@@ -1,3 +1,0 @@
-<library path="modules/perception/lidar_detection/down_sample_bank/pcl_down_sample/libpcl_down_sample.so">
-    <class type="apollo::perception::lidar::PclDownSample" base_class="apollo::perception::lidar::BaseDownSample"></class>
-</library>
