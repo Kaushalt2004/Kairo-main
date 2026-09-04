@@ -1,0 +1,16 @@
+transport_conf {
+    communication_mode {
+        same_proc: INTRA
+        diff_proc: RTPS
+        diff_host: RTPS
+    }
+}
+
+run_mode_conf {
+    run_mode: MODE_REALITY
+}
+
+scheduler_conf {
+    routine_num: 100
+    default_proc_num: 16
+}

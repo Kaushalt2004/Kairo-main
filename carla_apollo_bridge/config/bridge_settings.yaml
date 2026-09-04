@@ -1,0 +1,37 @@
+
+apply_control : true  # if false, the ego vehicle will follow the planned trajectory without control
+
+publishing_rate: 100   
+
+publish_localization_chassis_msgs: true
+
+publish_gnss: true
+publish_imu: true
+
+publish_lidar_msg: true
+publish_camera_msg: false
+
+publish_obstacles_ground_truth: true
+detection_radius: 45
+
+publish_traffic_light_gt: true
+
+# cyber channels:
+localization_channel: '/apollo/localization/pose'
+chassis_channel: '/apollo/canbus/chassis'
+control_channel: '/apollo/control'
+planning_channel: '/apollo/planning'
+lidar_channel : '/apollo/sensor/lidar128/compensator/PointCloud2'
+camera_channel : '/apollo/sensor/camera/front_6mm/image/compressed'
+perception_channel: '/apollo/perception/obstacles'
+traffic_light_channel: '/apollo/perception/traffic_light'
+imu_channel: '/apollo/sensor/gnss/imu'
+gps_channel: '/apollo/sensor/gnss/odometry'
+tf_channel : '/tf'
+
+carla:
+  # the network connection for the python connection to CARLA
+  host: '172.31.128.1'
+  #host: '192.168.125.110' #remote server
+  port: 2000
+  

@@ -1,0 +1,10 @@
+# Fallback path config for LaneFollowStage (CARLA-Apollo override)
+# Used when both LaneFollowPath and LaneBorrowPath fail to produce a valid path.
+path_optimizer_config {
+  l_weight: 1.0
+  dl_weight: 5.0
+  ddl_weight: 800.0
+  dddl_weight: 30000.0
+  path_reference_l_weight: 100.0
+  lateral_derivative_bound_default: 2.0
+}

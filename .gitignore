@@ -1,0 +1,47 @@
+# Node modules
+node_modules/
+.next/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Logs
+*.log
+nohup.out
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Bazel (too large)
+apollo/bazel-bin/
+apollo/bazel-out/
+apollo/bazel-testlogs/
+apollo/bazel-apollo/
+apollo/.cache/
+
+# CARLA egg/whl files (large binaries)
+*.egg
+*.whl
+
+# Docker
+apollo/docker/
+
+# Data/logs inside apollo
+apollo/data/log/
+apollo/data/core/
+apollo/dumps/
+
+# Environment
+.env
+.env.local

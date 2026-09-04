@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/external_command_msgs/geometry.proto";
+
+message ZoneCoverCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // If the start pose is set as the first point of "way_point".
+  optional bool is_start_pose_set = 3 [default = false];
+  required string zone_cover_area_id = 4;
+  optional double target_speed = 5;
+  repeated RoiPolygon non_drivable_roi = 6;
+  optional RoiPolygon drivable_roi = 7;
+}
