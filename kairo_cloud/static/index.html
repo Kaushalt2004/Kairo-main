@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kairo Cloud // Autonomous Mobility Mission Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --bg-panel: #0b1120;
+      --bg-card: #0f172a;
+      --border-color: #1e293b;
+      --border-focus: #0284c7;
+      --cyan-neon: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.4);
+      --sky: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    header {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cyan-neon);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .connection-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      font-weight: 600;
+    }
+
+    .connection-badge.offline {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--rose);
+      color: var(--rose);
+    }
+
+    .indicator-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    /* Main Grid Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      gap: 20px;
+      padding: 20px 24px;
+      flex: 1;
+    }
+
+    /* Cards & Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Fleet Vehicle List */
+    .vehicle-item {
+      padding: 14px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .vehicle-item:hover, .vehicle-item.active {
+      border-color: var(--sky);
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
+    }
+
+    .vehicle-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .vehicle-name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .vehicle-status {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-online { background: rgba(16, 185, 129, 0.2); color: var(--emerald); }
+    .status-offline { background: rgba(239, 68, 68, 0.2); color: var(--rose); }
+
+    /* Center Driving Dynamics */
+    .dynamics-center {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 20px;
+    }
+
+    .gauges-row {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    /* Speedometer Gauge */
+    .speedo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .gauge-wrapper {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-135deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: var(--border-color);
+      stroke-width: 14;
+      stroke-linecap: round;
+    }
+
+    .gauge-progress {
+      fill: none;
+      stroke: url(#cyan-grad);
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-dasharray: 565;
+      stroke-dashoffset: 565;
+      transition: stroke-dashoffset 0.15s ease;
+    }
+
+    .speedo-content {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .speed-gear {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--sky);
+      background: var(--bg-panel);
+      padding: 3px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      letter-spacing: 2px;
+    }
+
+    .speed-val {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      color: #fff;
+      margin-top: 4px;
+      letter-spacing: -2px;
+    }
+
+    .speed-unit {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 1.5px;
+    }
+
+    /* Actuator Indicators */
+    .actuators-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      height: 100%;
+    }
+
+    .actuator-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .actuator-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: var(--bg-panel);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 6px;
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+
+    .fill-throttle { background: linear-gradient(90deg, #059669, #10b981); }
+    .fill-brake { background: linear-gradient(90deg, #dc2626, #ef4444); }
+
+    /* Trajectory Canvas Map */
+    .map-card {
+      background: #020617;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 320px;
+    }
+
+    #trackCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .map-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(11, 17, 32, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    /* Sensor Matrix */
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .sensor-tile {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sensor-tile-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .sensor-tile-status {
+      font-size: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Right Control Column */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      color: #fff;
+    }
+
+    .btn-primary { background: #0284c7; }
+    .btn-primary:hover { background: #0369a1; box-shadow: 0 0 12px rgba(2, 132, 199, 0.4); }
+
+    .btn-secondary { background: var(--bg-panel); border-color: var(--border-color); color: var(--text-muted); }
+    .btn-secondary:hover { border-color: var(--sky); color: #fff; }
+
+    .btn-estop {
+      grid-column: 1 / -1;
+      background: #dc2626;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+    }
+    .btn-estop:hover { background: #b91c1c; }
+
+    /* Command Audit Log */
+    .audit-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .audit-item {
+      padding: 8px 12px;
+      background: var(--bg-panel);
+      border-left: 3px solid var(--sky);
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .audit-item.COMPLETED { border-left-color: var(--emerald); }
+    .audit-item.FAILED { border-left-color: var(--rose); }
+
+    /* Compute Grid */
+    .compute-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .compute-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .compute-box-val {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--sky);
+    }
+
+    .compute-box-lbl {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">K</div>
+      <div class="brand-title">KAIRO CLOUD</div>
+      <div class="brand-tag">AUTONOMOUS MISSION CONTROL</div>
+    </div>
+    <div class="header-status">
+      <div id="connectionBadge" class="connection-badge">
+        <span class="indicator-pulse"></span>
+        <span id="connectionText">CONNECTING...</span>
+      </div>
+      <div>LAT: <span id="posLat" style="color: var(--sky);">37.4220</span></div>
+      <div>LON: <span id="posLon" style="color: var(--sky);">-122.0841</span></div>
+      <div id="simModeBadge" style="background: var(--bg-card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color); color: var(--emerald);">AUTONOMOUS</div>
+    </div>
+  </header>
+
+  <!-- Main Dashboard -->
+  <main class="dashboard-container">
+
+    <!-- Left: Fleet Selector -->
+    <aside class="panel">
+      <div class="panel-header">
+        <span>Fleet Vehicles</span>
+        <span style="color: var(--emerald);" id="activeCount">1 ONLINE</span>
+      </div>
+      <div id="fleetList" style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="vehicle-item active" onclick="selectVehicle('KAIRO-001')">
+          <div class="vehicle-item-header">
+            <span class="vehicle-name">KAIRO-001</span>
+            <span class="vehicle-status status-online">CARLA // AP13</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted);">Lincoln MKZ Hybrid Autonomous</div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
+            <span id="v1-speed" style="color: var(--sky); font-weight: bold;">-- km/h</span>
+            <span id="v1-mode" style="color: var(--emerald);">STANDBY</span>
+          </div>
+        </div>
+
+        <div class="vehicle-item" onclick="selectVehicle('KAIRO-002')">
+          <div class="vehicle-item-header">
+            <span class="vehicle-name">KAIRO-002</span>
+            <span class="vehicle-status status-offline">STANDBY</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted);">CyberTruck Autonomous Testbed</div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
+            <span style="color: var(--text-dim); font-weight: bold;">0 km/h</span>
+            <span style="color: var(--text-dim);">OFFLINE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compute Hardware Metrics -->
+      <div class="panel-header" style="margin-top: 10px;">
+        <span>Edge Compute</span>
+        <span id="computeTemp" style="color: #f97316;">51°C</span>
+      </div>
+      <div class="compute-grid">
+        <div class="compute-box">
+          <div class="compute-box-lbl">CPU</div>
+          <div class="compute-box-val" id="valCpu">--%</div>
+        </div>
+        <div class="compute-box">
+          <div class="compute-box-lbl">GPU</div>
+          <div class="compute-box-val" id="valGpu" style="color: #a855f7;">--%</div>
+        </div>
+        <div class="compute-box">
+          <div class="compute-box-lbl">RAM</div>
+          <div class="compute-box-val" id="valRam" style="color: var(--emerald);">--%</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center: Dynamics & Trajectory -->
+    <section class="dynamics-center">
+      <div class="gauges-row">
+        <!-- Speedometer -->
+        <div class="speedo-card">
+          <div class="gauge-wrapper">
+            <svg class="gauge-svg" viewBox="0 0 200 200">
+              <defs>
+                <linearGradient id="cyan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0284c7"/>
+                  <stop offset="100%" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+              <circle class="gauge-bg" cx="100" cy="100" r="90" stroke-dasharray="424" stroke-dashoffset="106"/>
+              <circle id="speedArc" class="gauge-progress" cx="100" cy="100" r="90" stroke-dasharray="424" stroke-dashoffset="424"/>
+            </svg>
+            <div class="speedo-content">
+              <div class="speed-gear" id="gearDisplay">D</div>
+              <div class="speed-val" id="speedDisplay">0</div>
+              <div class="speed-unit">KM/H</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Throttle, Brake, Steering -->
+        <div class="actuators-card">
+          <div class="actuator-bar-wrap">
+            <div class="actuator-label">
+              <span>THROTTLE</span>
+              <span id="valThrottle">0%</span>
+            </div>
+            <div class="progress-track">
+              <div id="barThrottle" class="progress-fill fill-throttle"></div>
+            </div>
+          </div>
+
+          <div class="actuator-bar-wrap">
+            <div class="actuator-label">
+              <span>BRAKE</span>
+              <span id="valBrake">0%</span>
+            </div>
+            <div class="progress-track">
+              <div id="barBrake" class="progress-fill fill-brake"></div>
+            </div>
+          </div>
+
+          <div class="actuator-bar-wrap">
+            <div class="actuator-label">
+              <span>STEERING ANGLE</span>
+              <span id="valSteering">0.0°</span>
+            </div>
+            <div class="progress-track" style="position: relative;">
+              <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--border-color);"></div>
+              <div id="barSteer" style="height: 100%; width: 4px; background: var(--sky); position: absolute; left: 50%; transition: left 0.15s ease;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bird's-eye Navigation Map -->
+      <div class="map-card">
+        <canvas id="trackCanvas"></canvas>
+        <div class="map-badge" id="mapBadge">SCENARIO: Town01_Standard • WEATHER: ClearNoon • HEADING: 0°</div>
+      </div>
+
+      <!-- Sensor Perception Matrix -->
+      <div class="panel" style="padding: 16px;">
+        <div class="panel-header">
+          <span>Perception Matrix</span>
+          <span style="color: var(--emerald);" id="sensorSummary">5/5 ONLINE</span>
+        </div>
+        <div class="sensor-grid" id="sensorGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Mission Commands & Audit Stream -->
+    <aside class="panel">
+      <div class="panel-header">
+        <span>Mission Controls</span>
+        <span style="color: var(--sky);">COMMAND GATEWAY</span>
+      </div>
+
+      <div class="actions-grid">
+        <button class="btn btn-primary" onclick="sendCommand('START_SIMULATION', {scenario: 'Town01_Standard'})">
+          ▶ START SIM
+        </button>
+        <button class="btn btn-secondary" onclick="sendCommand('STOP_SIMULATION', {})">
+          ⏹ STOP SIM
+        </button>
+        <button class="btn btn-secondary" onclick="sendCommand('CHANGE_WEATHER', {weather: 'ClearNoon'})">
+          ☀ CLEAR NOON
+        </button>
+        <button class="btn btn-secondary" onclick="sendCommand('CHANGE_WEATHER', {weather: 'HardRainNoon'})">
+          🌧 RAIN NOON
+        </button>
+        <button class="btn btn-secondary" onclick="sendCommand('SET_AUTONOMY_MODE', {mode: 'MANUAL'})">
+          MANUAL
+        </button>
+        <button class="btn btn-secondary" onclick="sendCommand('SET_AUTONOMY_MODE', {mode: 'AUTONOMOUS'})">
+          AUTO DRIVE
+        </button>
+        <button class="btn btn-estop" onclick="sendCommand('SET_AUTONOMY_MODE', {mode: 'EMERGENCY_STOP'})">
+          ⚠ EMERGENCY STOP
+        </button>
+      </div>
+
+      <!-- Command Audit Log -->
+      <div class="panel-header" style="margin-top: 10px;">
+        <span>Command Audit Log</span>
+        <span style="color: var(--text-dim);" id="cmdCount">0 ISSUED</span>
+      </div>
+      <div class="audit-list" id="auditList">
+        <div class="audit-item COMPLETED">
+          <span>Kairo Cloud Gateway Initialized</span>
+          <span>READY</span>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <script>
+    let activeVehicleId = "KAIRO-001";
+    let ws = null;
+    let trackHistory = [];
+    const canvas = document.getElementById("trackCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function selectVehicle(vid) {
+      activeVehicleId = vid;
+      trackHistory = [];
+      connectWebSocket();
+    }
+
+    function connectWebSocket() {
+      if (ws) {
+        ws.close();
+      }
+      const host = window.location.host;
+      const wsProto = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${wsProto}//${host}/ws/v1/stream/telemetry?vehicle_id=${activeVehicleId}`;
+
+      document.getElementById("connectionText").innerText = "CONNECTING...";
+      document.getElementById("connectionBadge").className = "connection-badge offline";
+
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        document.getElementById("connectionText").innerText = `CLOUD LIVE // ${activeVehicleId}`;
+        document.getElementById("connectionBadge").className = "connection-badge";
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "telemetry" && msg.data) {
+            updateTelemetryUI(msg.data);
+          } else if (msg.type === "command_update" && msg.data) {
+            updateCommandUI(msg.data);
+          }
+        } catch (e) {
+          console.error("Error parsing WS frame:", e);
+        }
+      };
+
+      ws.onclose = () => {
+        document.getElementById("connectionText").innerText = "OFFLINE - RETRYING";
+        document.getElementById("connectionBadge").className = "connection-badge offline";
+        setTimeout(connectWebSocket, 3000);
+      };
+    }
+
+    function updateTelemetryUI(data) {
+      const kin = data.kinematics || {};
+      const ctrl = data.controls || {};
+      const loc = data.location || {};
+      const comp = data.compute || {};
+      const auto = data.autonomy || {};
+      const sim = data.simulation || {};
+
+      // Speedometer & Arc
+      const speedKmh = Math.round(kin.speed_kmh || (kin.speed || 0) * 3.6);
+      document.getElementById("speedDisplay").innerText = speedKmh;
+      document.getElementById("gearDisplay").innerText = ctrl.gear || "D";
+
+      // 424 is the stroke-dasharray for r=90
+      const maxSpeed = 140;
+      const progress = Math.min(speedKmh / maxSpeed, 1.0);
+      const dashoffset = 424 - (progress * (424 * 0.75));
+      document.getElementById("speedArc").style.strokeDashoffset = dashoffset;
+
+      // Actuators
+      const throttlePct = Math.round((ctrl.throttle || 0) * 100);
+      const brakePct = Math.round((ctrl.brake || 0) * 100);
+      const steerVal = ctrl.steering || 0;
+      document.getElementById("valThrottle").innerText = `${throttlePct}%`;
+      document.getElementById("barThrottle").style.width = `${throttlePct}%`;
+
+      document.getElementById("valBrake").innerText = `${brakePct}%`;
+      document.getElementById("barBrake").style.width = `${brakePct}%`;
+
+      document.getElementById("valSteering").innerText = `${Math.round(steerVal * 450)}°`;
+      const steerPct = (steerVal + 1.0) / 2.0 * 100;
+      document.getElementById("barSteer").style.left = `calc(${steerPct}% - 2px)`;
+
+      // GPS & Mode
+      if (loc.latitude) {
+        document.getElementById("posLat").innerText = loc.latitude.toFixed(5);
+        document.getElementById("posLon").innerText = loc.longitude.toFixed(5);
+      }
+      document.getElementById("simModeBadge").innerText = auto.mode || "STANDBY";
+      document.getElementById("simModeBadge").style.color = auto.mode === "EMERGENCY_STOP" ? "var(--rose)" : "var(--emerald)";
+
+      // Edge Compute
+      document.getElementById("valCpu").innerText = `${Math.round(comp.cpu_usage || 0)}%`;
+      document.getElementById("valGpu").innerText = `${Math.round(comp.gpu_usage || 0)}%`;
+      document.getElementById("valRam").innerText = `${Math.round(comp.memory_usage || 0)}%`;
+      if (comp.temperature_c) {
+        document.getElementById("computeTemp").innerText = `${Math.round(comp.temperature_c)}°C`;
+      }
+
+      // Fleet list live updates
+      if (data.vehicle_id === "KAIRO-001") {
+        document.getElementById("v1-speed").innerText = `${speedKmh} km/h`;
+        document.getElementById("v1-mode").innerText = auto.mode || "ONLINE";
+      }
+
+      // Map Badge
+      document.getElementById("mapBadge").innerText = `SIM: ${sim.simulator || "CARLA"} • ${sim.scenario || "Town01"} • ${sim.weather || "ClearNoon"} • HEADING: ${Math.round(loc.heading || 0)}°`;
+
+      // Sensors
+      if (data.sensors) {
+        renderSensors(data.sensors);
+      }
+
+      // Draw trajectory on canvas
+      if (loc.latitude && loc.longitude) {
+        trackHistory.push({ lat: loc.latitude, lon: loc.longitude, heading: loc.heading || 0 });
+        if (trackHistory.length > 200) trackHistory.shift();
+        drawTrajectory();
+      }
+    }
+
+    function renderSensors(sensors) {
+      const grid = document.getElementById("sensorGrid");
+      grid.innerHTML = "";
+      sensors.forEach(s => {
+        const isOnline = s.status === "ONLINE";
+        const col = isOnline ? "var(--emerald)" : "var(--rose)";
+        const tile = document.createElement("div");
+        tile.className = "sensor-tile";
+        tile.innerHTML = `
+          <div class="sensor-tile-name">${s.name}</div>
+          <div class="sensor-tile-status" style="color: ${col};">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: ${col}; display: inline-block;"></span>
+            ${s.status} • ${Math.round(s.fps || 0)}Hz
+          </div>
+        `;
+        grid.appendChild(tile);
+      });
+    }
+
+    function drawTrajectory() {
+      if (trackHistory.length === 0) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Grid
+      ctx.strokeStyle = "rgba(30, 41, 59, 0.4)";
+      ctx.lineWidth = 1;
+      const step = 30;
+      for (let x = 0; x < canvas.width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Normalize GPS to canvas coordinates
+      const current = trackHistory[trackHistory.length - 1];
+      const scale = 250000;
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // Draw Trail
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(6, 182, 212, 0.5)";
+      ctx.lineWidth = 3;
+      trackHistory.forEach((pt, idx) => {
+        const x = cx + (pt.lon - current.lon) * scale;
+        const y = cy - (pt.lat - current.lat) * scale;
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Draw Vehicle Pointer
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate((current.heading * Math.PI) / 180);
+
+      ctx.fillStyle = "#0284c7";
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(-12, -20, 24, 40, [6]);
+      ctx.fill();
+      ctx.stroke();
+
+      // Heading arrow
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.moveTo(0, -14);
+      ctx.lineTo(6, 0);
+      ctx.lineTo(-6, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    async function sendCommand(commandType, parameters) {
+      try {
+        const res = await fetch(`/api/v1/commands/${activeVehicleId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer dev_token" // Backend accepts dev or operator
+          },
+          body: JSON.stringify({
+            command_type: commandType,
+            parameters: parameters
+          })
+        });
+        const data = await res.json();
+        addAuditLog(commandType, data.data ? data.data.status : "SENT");
+      } catch (e) {
+        console.error("Failed to send command:", e);
+        addAuditLog(commandType, "ERROR");
+      }
+    }
+
+    function addAuditLog(cmd, status) {
+      const list = document.getElementById("auditList");
+      const item = document.createElement("div");
+      item.className = `audit-item ${status}`;
+      item.innerHTML = `
+        <span>${cmd}</span>
+        <span style="font-weight: bold;">${status}</span>
+      `;
+      list.insertBefore(item, list.firstChild);
+    }
+
+    function updateCommandUI(cmdUpdate) {
+      addAuditLog(cmdUpdate.command_id || "CMD", cmdUpdate.status);
+    }
+
+    // Initialize
+    connectWebSocket();
+  </script>
+</body>
+</html>

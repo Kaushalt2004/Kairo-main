@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kairo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kairo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./kairo_cloud/db/init_db.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kairo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kairo_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  kairo-cloud:
+    build:
+      context: ./kairo_cloud
+      dockerfile: Dockerfile
+    container_name: kairo_cloud_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/kairo
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=kairo_super_secret_jwt_key_autonomous_mobility_platform_2026
+      - PROJECT_NAME=Kairo Cloud Backend
+      - LOG_LEVEL=INFO
+      - HOST=0.0.0.0
+      - PORT=8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  kairo-agent:
+    build:
+      context: ./kairo_agent
+      dockerfile: Dockerfile
+    container_name: kairo_vehicle_agent
+    restart: unless-stopped
+    environment:
+      - KAIRO_CLOUD_WS_URL=ws://kairo-cloud:8000
+      - KAIRO_VEHICLE_ID=KAIRO-001
+      - KAIRO_API_KEY=kairo_live_vehicle_kairo_001_key_secret_123
+      - KAIRO_ADAPTER_TYPE=mock
+      - KAIRO_TELEMETRY_RATE_HZ=10.0
+    depends_on:
+      - kairo-cloud
+
+volumes:
+  postgres_data:
+  redis_data:

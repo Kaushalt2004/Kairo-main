@@ -14,6 +14,7 @@ build/
 # Logs
 *.log
 nohup.out
+*.INFO*
 
 # OS files
 .DS_Store

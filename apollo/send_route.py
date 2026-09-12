@@ -1,14 +1,15 @@
 import sys
 import time
 
+sys.path.insert(0, '/usr/local/lib/dreamview/dreamview.runfiles/apollo')
 sys.path.append('/apollo')
 sys.path.append('/apollo/bazel-bin/cyber/python/internal')
 sys.path.append('/apollo/bazel-bin')
 
 from cyber.python.cyber_py3 import cyber
-from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.routing.proto.routing_pb2 import RoutingRequest
-from modules.planning.proto.pad_msg_pb2 import PadMessage, DrivingAction
+from modules.common_msgs.localization_msgs.localization_pb2 import LocalizationEstimate
+from modules.common_msgs.routing_msgs.routing_pb2 import RoutingRequest
+from modules.common_msgs.planning_msgs.pad_msg_pb2 import PadMessage
 
 def main():
     cyber.init()
@@ -40,7 +41,6 @@ def main():
     # Create routing writers
     routing_writer = node.create_writer('/apollo/routing_request', RoutingRequest)
     pad_writer = node.create_writer('/apollo/planning/pad', PadMessage)
-    pad_ctrl_writer = node.create_writer('/apollo/control/pad', PadMessage)
     time.sleep(1)
 
     import math
@@ -49,7 +49,7 @@ def main():
     dy = 60.0 * math.sin(current_heading)
 
     req = RoutingRequest()
-    req.header.timestamp_sec = cyber.Time.now().to_sec()
+    req.header.timestamp_sec = time.time()
     req.header.module_name = 'routing'
 
     wp1 = req.waypoint.add()
@@ -67,10 +67,9 @@ def main():
     time.sleep(2)
 
     pad_msg = PadMessage()
-    pad_msg.action = DrivingAction.START
+    pad_msg.action = PadMessage.FOLLOW
     pad_writer.write(pad_msg)
-    pad_ctrl_writer.write(pad_msg)
-    print("START command published to /apollo/planning/pad and /apollo/control/pad!")
+    print("FOLLOW command published to /apollo/planning/pad!")
 
     cyber.shutdown()
 
