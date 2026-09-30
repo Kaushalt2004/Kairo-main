@@ -161,6 +161,10 @@ All REST responses follow the standard Kairo envelope:
   - `CHANGE_WEATHER`: `{"weather": "ClearNoon" | "WetNoon" | "HardRainNoon" | ...}`
   - `CHANGE_TIME`: `{"hour": 16.5}`
   - `SET_AUTONOMY_MODE`: `{"mode": "MANUAL" | "ASSISTED" | "AUTONOMOUS" | "EMERGENCY_STOP"}`
+  - `ENGAGE_AUTONOMOUS`: `{}` (Engages Apollo path following & autonomous control)
+  - `DISENGAGE_AUTONOMOUS`: `{}` (Reverts Apollo to manual control)
+  - `EMERGENCY_STOP`: `{}` (Publishes emergency stop / braking to Apollo)
+  - `SEND_ROUTE`: `{"distance": 60.0}` or `{"x": 200.0, "y": -65.0}` (Dispatches Apollo RoutingRequest)
   - `REQUEST_DIAGNOSTICS`: `{}`
 
 ### List Vehicle Commands Audit Log

@@ -18,6 +18,8 @@ class AgentConfig:
     # Apollo settings
     apollo_bridge_host: str = os.getenv("APOLLO_BRIDGE_HOST", "127.0.0.1")
     apollo_bridge_port: int = int(os.getenv("APOLLO_BRIDGE_PORT", "9090"))
+    apollo_container_name: str = os.getenv("APOLLO_CONTAINER_NAME", "apollo_dev_kairo_it37")
+    apollo_api_url: str = os.getenv("APOLLO_API_URL", "http://127.0.0.1:8000")
 
     # Offline Queue
     offline_queue_path: str = os.getenv("OFFLINE_QUEUE_PATH", "kairo_offline_queue.db")

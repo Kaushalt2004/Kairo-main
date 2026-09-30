@@ -181,3 +181,37 @@ async def test_command_validation_and_dispatch():
             }
         )
         assert bad_res.status_code == 422
+
+        # Autonomous engagement command
+        auto_res = await ac.post(
+            "/api/v1/commands/KAIRO-TEST-001",
+            headers={"Authorization": f"Bearer {admin_token}"},
+            json={
+                "command_type": "SET_AUTONOMY_MODE",
+                "parameters": {"mode": "AUTONOMOUS"}
+            }
+        )
+        assert auto_res.status_code == 202
+        assert auto_res.json()["data"]["command_type"] == "SET_AUTONOMY_MODE"
+
+        # Emergency stop command
+        estop_res = await ac.post(
+            "/api/v1/commands/KAIRO-TEST-001",
+            headers={"Authorization": f"Bearer {admin_token}"},
+            json={
+                "command_type": "SET_AUTONOMY_MODE",
+                "parameters": {"mode": "EMERGENCY_STOP"}
+            }
+        )
+        assert estop_res.status_code == 202
+
+        # Send route command
+        route_res = await ac.post(
+            "/api/v1/commands/KAIRO-TEST-001",
+            headers={"Authorization": f"Bearer {admin_token}"},
+            json={
+                "command_type": "SEND_ROUTE",
+                "parameters": {"distance": 50.0}
+            }
+        )
+        assert route_res.status_code == 202

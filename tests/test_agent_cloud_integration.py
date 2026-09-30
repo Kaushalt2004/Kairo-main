@@ -44,6 +44,54 @@ async def test_mock_adapter_telemetry_and_commands():
     await adapter.shutdown()
 
 
+@pytest.mark.asyncio
+async def test_apollo_adapter_cloud_actions():
+    from kairo_agent.adapters.apollo_adapter import ApolloAdapter
+    adapter = ApolloAdapter(vehicle_id="KAIRO-001")
+    init_ok = await adapter.initialize()
+    assert init_ok is True
+
+    # 1. Telemetry in default manual mode
+    telemetry = await adapter.poll_telemetry()
+    assert telemetry is not None
+    assert telemetry["vehicle_id"] == "KAIRO-001"
+    assert telemetry["autonomy"]["mode"] == "MANUAL"
+
+    # 2. UI commands Auto Drive (Engage Autonomous)
+    auto_res = await adapter.execute_command("SET_AUTONOMY_MODE", {"mode": "AUTONOMOUS"})
+    assert auto_res["status"] == "success"
+    assert auto_res["action_executed"] == "START"
+    assert auto_res["apollo_mode"] == "AUTONOMOUS"
+
+    # Verify telemetry reflects autonomous mode
+    telemetry_auto = await adapter.poll_telemetry()
+    assert telemetry_auto["autonomy"]["mode"] == "AUTONOMOUS"
+    assert telemetry_auto["autonomy"]["status"] == "ACTIVE"
+
+    # 3. UI commands Emergency Stop
+    estop_res = await adapter.execute_command("SET_AUTONOMY_MODE", {"mode": "EMERGENCY_STOP"})
+    assert estop_res["status"] == "success"
+    assert estop_res["action_executed"] == "STOP"
+    assert estop_res["apollo_mode"] == "EMERGENCY_STOP"
+
+    telemetry_estop = await adapter.poll_telemetry()
+    assert telemetry_estop["autonomy"]["mode"] == "EMERGENCY_STOP"
+    assert telemetry_estop["controls"]["handbrake"] is True
+
+    # 4. UI commands Disengage / Manual Takeover
+    manual_res = await adapter.execute_command("SET_AUTONOMY_MODE", {"mode": "MANUAL"})
+    assert manual_res["status"] == "success"
+    assert manual_res["action_executed"] == "RESET"
+    assert manual_res["apollo_mode"] == "MANUAL"
+
+    # 5. UI commands Send Route
+    route_res = await adapter.execute_command("SEND_ROUTE", {"distance": 75.0})
+    assert route_res["status"] == "success"
+    assert route_res["action_executed"] == "ROUTE"
+
+    await adapter.shutdown()
+
+
 def test_offline_queue_buffering_and_draining():
     with tempfile.TemporaryDirectory() as tmpdir:
         db_path = os.path.join(tmpdir, "test_queue.db")

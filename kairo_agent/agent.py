@@ -45,7 +45,9 @@ class KairoVehicleAgent:
             return ApolloAdapter(
                 bridge_host=self.config.apollo_bridge_host,
                 bridge_port=self.config.apollo_bridge_port,
-                vehicle_id=self.config.vehicle_id
+                vehicle_id=self.config.vehicle_id,
+                container_name=self.config.apollo_container_name,
+                apollo_api_url=self.config.apollo_api_url
             )
         elif adapter_type == "ros2":
             return Ros2Adapter(vehicle_id=self.config.vehicle_id)
