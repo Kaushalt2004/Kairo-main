@@ -1,8 +1,9 @@
 import json
 import logging
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Iterator, List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +16,23 @@ class OfflineQueue:
         self.max_size = max_size
         self._init_db()
 
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
+        """A connection that is committed on success and always closed.
+
+        `with sqlite3.connect(...) as conn` only commits or rolls back; it
+        never closes the connection. That leaked one handle per call (keeping
+        the database file locked on Windows) until garbage collection."""
+        conn = sqlite3.connect(self.db_path)
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
+
     def _init_db(self) -> None:
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._connect() as conn:
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS telemetry_queue (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,7 +49,7 @@ class OfflineQueue:
         """Stores a telemetry packet in the local database."""
         try:
             payload_str = json.dumps(payload)
-            with sqlite3.connect(self.db_path) as conn:
+            with self._connect() as conn:
                 conn.execute("INSERT INTO telemetry_queue (payload) VALUES (?);", (payload_str,))
                 conn.commit()
             return True
@@ -46,7 +61,7 @@ class OfflineQueue:
         """Retrieves the oldest queued records without deleting them."""
         results = []
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._connect() as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT id, payload FROM telemetry_queue ORDER BY id ASC LIMIT ?;", (limit,))
                 rows = cursor.fetchall()
@@ -62,7 +77,7 @@ class OfflineQueue:
             return
         try:
             placeholders = ",".join("?" for _ in ids)
-            with sqlite3.connect(self.db_path) as conn:
+            with self._connect() as conn:
                 conn.execute(f"DELETE FROM telemetry_queue WHERE id IN ({placeholders});", ids)
                 conn.commit()
         except Exception as e:
@@ -71,7 +86,7 @@ class OfflineQueue:
     def count(self) -> int:
         """Returns the number of buffered packets."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._connect() as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT COUNT(*) FROM telemetry_queue;")
                 return cursor.fetchone()[0]

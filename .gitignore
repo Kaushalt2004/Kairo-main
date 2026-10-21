@@ -46,3 +46,10 @@ apollo/dumps/
 # Environment
 .env
 .env.local
+
+# Flutter build output and local secrets
+**/.dart_tool/
+**/build/
+*.iml
+vehicle_tablet_ui_segregated/dart_defines.json
+kairo_gateway/data/
