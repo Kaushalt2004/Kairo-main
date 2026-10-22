@@ -1,0 +1,14 @@
+name: town05_stop_resume_latency
+description: Operator stops and resumes mid-trip while trip commands are delayed by 800 ms
+start: map_start
+destination: {x: -155.5, y: -91.7}
+cruise_kph: 30
+timeout_s: 200
+hazards:
+  - {at_s: 1, type: command_latency, delay_ms: 800, duration_s: 40}
+actions:
+  - {at_s: 12, do: stop}
+  - {at_s: 20, do: resume}
+expect:
+  verdict: PASS
+repeat: 3

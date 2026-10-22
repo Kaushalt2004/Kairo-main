@@ -1,0 +1,12 @@
+name: town05_corner_phantom
+description: Two-corner route; a stalled car appears 35 m ahead on the straight and is removed after 12 s
+start: map_start
+destination: {x: -155.5, y: -91.7}
+cruise_kph: 30
+timeout_s: 200
+hazards:
+  - {at_s: 8, type: phantom_obstacle, ahead_m: 35, duration_s: 12}
+expect:
+  verdict: PASS
+  forbid: [R6, R7, R11]
+repeat: 3

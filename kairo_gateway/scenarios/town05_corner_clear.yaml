@@ -1,0 +1,10 @@
+name: town05_corner_clear
+description: Two-corner route on Town05 with no traffic or hazards (baseline)
+start: map_start
+destination: {x: -155.5, y: -91.7}
+cruise_kph: 30
+timeout_s: 180
+expect:
+  verdict: PASS
+  max_duration_s: 120
+repeat: 3

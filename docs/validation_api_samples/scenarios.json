@@ -1,0 +1,92 @@
+{
+ "scenarios": [
+  {
+   "id": "town05_corner_clear",
+   "name": "town05_corner_clear",
+   "description": "Two-corner route on Town05 with no traffic or hazards (baseline)",
+   "repeat": 3,
+   "traffic": false,
+   "hazards": [],
+   "actions": []
+  },
+  {
+   "id": "town05_corner_phantom",
+   "name": "town05_corner_phantom",
+   "description": "Two-corner route; a stalled car appears 35 m ahead on the straight and is removed after 12 s",
+   "repeat": 3,
+   "traffic": false,
+   "hazards": [
+    "phantom_obstacle"
+   ],
+   "actions": []
+  },
+  {
+   "id": "town05_corner_traffic",
+   "name": "town05_corner_traffic",
+   "description": "Two-corner route with 8 simulated vehicles driving around the car",
+   "repeat": 5,
+   "traffic": true,
+   "hazards": [],
+   "actions": []
+  },
+  {
+   "id": "town05_demo_traffic_hazards",
+   "name": "town05_demo_traffic_hazards",
+   "description": "Demo drive with traffic, a stalled car, a perception dropout and a short telemetry dropout (used to record the mock gateway's session)",
+   "repeat": 1,
+   "traffic": true,
+   "hazards": [
+    "phantom_obstacle",
+    "perception_dropout",
+    "telemetry_dropout"
+   ],
+   "actions": []
+  },
+  {
+   "id": "town05_lane_change_clear",
+   "name": "town05_lane_change_clear",
+   "description": "Straight route that ends in the neighbouring lane, so Apollo must change lanes (baseline)",
+   "repeat": 3,
+   "traffic": false,
+   "hazards": [],
+   "actions": []
+  },
+  {
+   "id": "town05_lane_change_cut_in",
+   "name": "town05_lane_change_cut_in",
+   "description": "Straight route; a slower vehicle in the neighbouring lane cuts in ahead of the car",
+   "repeat": 3,
+   "traffic": false,
+   "hazards": [
+    "cut_in"
+   ],
+   "actions": []
+  },
+  {
+   "id": "town05_perception_dropout",
+   "name": "town05_perception_dropout",
+   "description": "Stalled car ahead, then perception drops out for 2 s while the car approaches it",
+   "repeat": 3,
+   "traffic": false,
+   "hazards": [
+    "phantom_obstacle",
+    "perception_dropout"
+   ],
+   "actions": []
+  },
+  {
+   "id": "town05_stop_resume_latency",
+   "name": "town05_stop_resume_latency",
+   "description": "Operator stops and resumes mid-trip while trip commands are delayed by 800 ms",
+   "repeat": 3,
+   "traffic": false,
+   "hazards": [
+    "command_latency"
+   ],
+   "actions": [
+    "stop",
+    "resume"
+   ]
+  }
+ ]
+}

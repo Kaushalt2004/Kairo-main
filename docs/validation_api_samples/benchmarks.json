@@ -1,0 +1,222 @@
+{
+ "benchmarks": [
+  {
+   "batch_id": "20261022-225147",
+   "finished_at": "2026-10-22T23:18:26",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_corner_clear",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_corner_phantom",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_corner_traffic",
+     "runs": 5,
+     "passed": 3,
+     "pass_rate": 0.6
+    },
+    {
+     "scenario": "town05_lane_change_clear",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_lane_change_cut_in",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_perception_dropout",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_stop_resume_latency",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-224310",
+   "finished_at": "2026-10-22T22:49:50",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_corner_traffic",
+     "runs": 5,
+     "passed": 2,
+     "pass_rate": 0.4
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-221618",
+   "finished_at": "2026-10-22T22:40:44",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_corner_clear",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_corner_phantom",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_corner_traffic",
+     "runs": 3,
+     "passed": 2,
+     "pass_rate": 0.667
+    },
+    {
+     "scenario": "town05_lane_change_clear",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_lane_change_cut_in",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_perception_dropout",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_stop_resume_latency",
+     "runs": 3,
+     "passed": 3,
+     "pass_rate": 1.0
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-221159",
+   "finished_at": "2026-10-22T22:15:52",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_lane_change_cut_in",
+     "runs": 2,
+     "passed": 2,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_corner_traffic",
+     "runs": 2,
+     "passed": 2,
+     "pass_rate": 1.0
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-220529",
+   "finished_at": "2026-10-22T22:10:28",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_lane_change_cut_in",
+     "runs": 1,
+     "passed": 1,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_corner_traffic",
+     "runs": 1,
+     "passed": 0,
+     "pass_rate": 0.0
+    },
+    {
+     "scenario": "town05_perception_dropout",
+     "runs": 1,
+     "passed": 1,
+     "pass_rate": 1.0
+    },
+    {
+     "scenario": "town05_stop_resume_latency",
+     "runs": 1,
+     "passed": 1,
+     "pass_rate": 1.0
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-220315",
+   "finished_at": "2026-10-22T22:04:04",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_lane_change_cut_in",
+     "runs": 1,
+     "passed": 0,
+     "pass_rate": 0.0
+    },
+    {
+     "scenario": "town05_corner_traffic",
+     "runs": 1,
+     "passed": 0,
+     "pass_rate": 0.0
+    },
+    {
+     "scenario": "town05_perception_dropout",
+     "runs": 1,
+     "passed": 0,
+     "pass_rate": 0.0
+    },
+    {
+     "scenario": "town05_stop_resume_latency",
+     "runs": 1,
+     "passed": 0,
+     "pass_rate": 0.0
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-220137",
+   "finished_at": "2026-10-22T22:02:55",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_corner_phantom",
+     "runs": 1,
+     "passed": 1,
+     "pass_rate": 1.0
+    }
+   ]
+  },
+  {
+   "batch_id": "20261022-215958",
+   "finished_at": "2026-10-22T22:01:12",
+   "stopped": false,
+   "scenarios": [
+    {
+     "scenario": "town05_corner_clear",
+     "runs": 1,
+     "passed": 1,
+     "pass_rate": 1.0
+    }
+   ]
+  }
+ ]
+}

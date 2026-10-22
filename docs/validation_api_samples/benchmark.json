@@ -1,0 +1,877 @@
+{
+ "batch_id": "20261022-225147",
+ "finished_at": "2026-10-22T23:18:26",
+ "stopped": false,
+ "scenarios": [
+  {
+   "scenario": "town05_corner_clear",
+   "runs": 3,
+   "passed": 3,
+   "pass_rate": 1.0,
+   "verdicts": {
+    "PASS": 3
+   },
+   "mean_trip_s": 71.1,
+   "sd_trip_s": 0.1,
+   "distance_km": 0.983,
+   "violations": 0,
+   "violations_per_km": 0.0,
+   "by_rule": {}
+  },
+  {
+   "scenario": "town05_corner_phantom",
+   "runs": 3,
+   "passed": 3,
+   "pass_rate": 1.0,
+   "verdicts": {
+    "PASS": 3
+   },
+   "mean_trip_s": 75.5,
+   "sd_trip_s": 0.3,
+   "distance_km": 0.984,
+   "violations": 0,
+   "violations_per_km": 0.0,
+   "by_rule": {}
+  },
+  {
+   "scenario": "town05_corner_traffic",
+   "runs": 5,
+   "passed": 3,
+   "pass_rate": 0.6,
+   "verdicts": {
+    "PASS": 3,
+    "FAIL": 2
+   },
+   "mean_trip_s": 73.2,
+   "sd_trip_s": 2.0,
+   "distance_km": 1.596,
+   "violations": 4,
+   "violations_per_km": 2.51,
+   "by_rule": {
+    "R2": 1,
+    "R3": 1,
+    "R9": 2
+   }
+  },
+  {
+   "scenario": "town05_lane_change_clear",
+   "runs": 3,
+   "passed": 3,
+   "pass_rate": 1.0,
+   "verdicts": {
+    "PASS": 3
+   },
+   "mean_trip_s": 32.7,
+   "sd_trip_s": 0.0,
+   "distance_km": 0.427,
+   "violations": 0,
+   "violations_per_km": 0.0,
+   "by_rule": {}
+  },
+  {
+   "scenario": "town05_lane_change_cut_in",
+   "runs": 3,
+   "passed": 3,
+   "pass_rate": 1.0,
+   "verdicts": {
+    "PASS": 3
+   },
+   "mean_trip_s": 39.0,
+   "sd_trip_s": 0.5,
+   "distance_km": 0.427,
+   "violations": 0,
+   "violations_per_km": 0.0,
+   "by_rule": {}
+  },
+  {
+   "scenario": "town05_perception_dropout",
+   "runs": 3,
+   "passed": 3,
+   "pass_rate": 1.0,
+   "verdicts": {
+    "PASS": 3
+   },
+   "mean_trip_s": 86.4,
+   "sd_trip_s": 0.1,
+   "distance_km": 0.983,
+   "violations": 5,
+   "violations_per_km": 5.09,
+   "by_rule": {
+    "R2": 5
+   }
+  },
+  {
+   "scenario": "town05_stop_resume_latency",
+   "runs": 3,
+   "passed": 3,
+   "pass_rate": 1.0,
+   "verdicts": {
+    "PASS": 3
+   },
+   "mean_trip_s": 83.5,
+   "sd_trip_s": 0.0,
+   "distance_km": 0.983,
+   "violations": 3,
+   "violations_per_km": 3.05,
+   "by_rule": {
+    "R2": 3
+   }
+  }
+ ],
+ "runs": [
+  {
+   "scenario": "town05_corner_clear",
+   "run": 1,
+   "trip_id": "20261022-225150-town05-corner-clear-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 71.15,
+   "distance_m": 327.5,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.14,
+    "max_decel_mps2": 0.74,
+    "max_lat_accel_mps2": 0.96,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_clear",
+   "run": 2,
+   "trip_id": "20261022-225304-town05-corner-clear-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 71.02,
+   "distance_m": 327.6,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.15,
+    "max_decel_mps2": 0.81,
+    "max_lat_accel_mps2": 0.9,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_clear",
+   "run": 3,
+   "trip_id": "20261022-225418-town05-corner-clear-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 71.04,
+   "distance_m": 327.6,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.3,
+    "max_decel_mps2": 0.68,
+    "max_lat_accel_mps2": 0.96,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_phantom",
+   "run": 1,
+   "trip_id": "20261022-225531-town05-corner-phantom-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 75.68,
+   "distance_m": 327.9,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.9,
+    "max_accel_mps2": 1.28,
+    "max_decel_mps2": 1.1,
+    "max_lat_accel_mps2": 0.89,
+    "min_gap_m": 14.99,
+    "min_ttc_s": 2.94,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 8.1,
+     "hazard": "phantom_obstacle",
+     "id": "hz-1"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_corner_phantom",
+   "run": 2,
+   "trip_id": "20261022-225650-town05-corner-phantom-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 75.56,
+   "distance_m": 328.0,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.8,
+    "max_accel_mps2": 1.16,
+    "max_decel_mps2": 1.17,
+    "max_lat_accel_mps2": 0.93,
+    "min_gap_m": 14.53,
+    "min_ttc_s": 2.91,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 8.2,
+     "hazard": "phantom_obstacle",
+     "id": "hz-2"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_corner_phantom",
+   "run": 3,
+   "trip_id": "20261022-225808-town05-corner-phantom-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 75.17,
+   "distance_m": 327.9,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.9,
+    "max_accel_mps2": 1.23,
+    "max_decel_mps2": 1.2,
+    "max_lat_accel_mps2": 0.95,
+    "min_gap_m": 14.56,
+    "min_ttc_s": 2.93,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 8.1,
+     "hazard": "phantom_obstacle",
+     "id": "hz-3"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_corner_traffic",
+   "run": 1,
+   "trip_id": "20261022-225927-town05-corner-traffic-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 71.65,
+   "distance_m": 327.4,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.04,
+    "max_decel_mps2": 2.69,
+    "max_lat_accel_mps2": 0.88,
+    "min_gap_m": null,
+    "min_ttc_s": 1.3,
+    "max_obstacles": 8,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_traffic",
+   "run": 2,
+   "trip_id": "20261022-230042-town05-corner-traffic-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 71.2,
+   "distance_m": 327.5,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.09,
+    "max_decel_mps2": 0.83,
+    "max_lat_accel_mps2": 0.9,
+    "min_gap_m": 46.25,
+    "min_ttc_s": 5.43,
+    "max_obstacles": 8,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_traffic",
+   "run": 3,
+   "trip_id": "20261022-230157-town05-corner-traffic-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 74.79,
+   "distance_m": 327.5,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.3,
+    "max_accel_mps2": 1.06,
+    "max_decel_mps2": 2.85,
+    "max_lat_accel_mps2": 0.91,
+    "min_gap_m": null,
+    "min_ttc_s": 2.65,
+    "max_obstacles": 8,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_traffic",
+   "run": 4,
+   "trip_id": "20261022-230316-town05-corner-traffic-r4",
+   "verdict": "FAIL",
+   "end_reason": "arrived",
+   "passed": false,
+   "failures": [
+    "verdict FAIL != PASS"
+   ],
+   "duration_s": 75.04,
+   "distance_m": 327.5,
+   "violations": [
+    "R2",
+    "R3"
+   ],
+   "counts": {
+    "critical": 1,
+    "warning": 1
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.23,
+    "max_decel_mps2": 6.69,
+    "max_lat_accel_mps2": 0.81,
+    "min_gap_m": null,
+    "min_ttc_s": 0.88,
+    "max_obstacles": 8,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_corner_traffic",
+   "run": 5,
+   "trip_id": "20261022-230435-town05-corner-traffic-r5",
+   "verdict": "FAIL",
+   "end_reason": "error",
+   "passed": false,
+   "failures": [
+    "verdict FAIL != PASS"
+   ],
+   "duration_s": 74.7,
+   "distance_m": 286.0,
+   "violations": [
+    "R9",
+    "R9"
+   ],
+   "counts": {
+    "critical": 2,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 29.0,
+    "max_accel_mps2": 1.29,
+    "max_decel_mps2": 1.92,
+    "max_lat_accel_mps2": 0.93,
+    "min_gap_m": 25.08,
+    "min_ttc_s": 1.51,
+    "max_obstacles": 8,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_lane_change_clear",
+   "run": 1,
+   "trip_id": "20261022-230552-town05-lane-change-clear-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 32.64,
+   "distance_m": 142.2,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.7,
+    "max_accel_mps2": 1.11,
+    "max_decel_mps2": 0.9,
+    "max_lat_accel_mps2": 1.46,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_lane_change_clear",
+   "run": 2,
+   "trip_id": "20261022-230627-town05-lane-change-clear-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 32.7,
+   "distance_m": 142.2,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.7,
+    "max_accel_mps2": 1.04,
+    "max_decel_mps2": 0.93,
+    "max_lat_accel_mps2": 1.47,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_lane_change_clear",
+   "run": 3,
+   "trip_id": "20261022-230703-town05-lane-change-clear-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 32.73,
+   "distance_m": 142.2,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.7,
+    "max_accel_mps2": 1.1,
+    "max_decel_mps2": 0.9,
+    "max_lat_accel_mps2": 1.45,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": []
+  },
+  {
+   "scenario": "town05_lane_change_cut_in",
+   "run": 1,
+   "trip_id": "20261022-230738-town05-lane-change-cut-in-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 38.83,
+   "distance_m": 142.2,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 25.3,
+    "max_accel_mps2": 1.06,
+    "max_decel_mps2": 1.94,
+    "max_lat_accel_mps2": 0.44,
+    "min_gap_m": 7.16,
+    "min_ttc_s": 4.39,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 11.1,
+     "hazard": "cut_in",
+     "id": "hz-4"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_lane_change_cut_in",
+   "run": 2,
+   "trip_id": "20261022-230820-town05-lane-change-cut-in-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 38.7,
+   "distance_m": 142.2,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 25.3,
+    "max_accel_mps2": 1.06,
+    "max_decel_mps2": 1.85,
+    "max_lat_accel_mps2": 0.43,
+    "min_gap_m": 7.12,
+    "min_ttc_s": 4.5,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 11.1,
+     "hazard": "cut_in",
+     "id": "hz-5"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_lane_change_cut_in",
+   "run": 3,
+   "trip_id": "20261022-230901-town05-lane-change-cut-in-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 39.57,
+   "distance_m": 142.2,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 25.0,
+    "max_accel_mps2": 1.26,
+    "max_decel_mps2": 1.82,
+    "max_lat_accel_mps2": 0.45,
+    "min_gap_m": 7.14,
+    "min_ttc_s": 4.55,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 11.1,
+     "hazard": "cut_in",
+     "id": "hz-6"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_perception_dropout",
+   "run": 1,
+   "trip_id": "20261022-230943-town05-perception-dropout-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 86.48,
+   "distance_m": 327.6,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 27.9,
+    "max_accel_mps2": 1.28,
+    "max_decel_mps2": 3.79,
+    "max_lat_accel_mps2": 0.91,
+    "min_gap_m": 5.09,
+    "min_ttc_s": 2.22,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 6.2,
+     "hazard": "phantom_obstacle",
+     "id": "hz-7"
+    },
+    {
+     "t_s": 9.1,
+     "hazard": "perception_dropout",
+     "id": "hz-8"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_perception_dropout",
+   "run": 2,
+   "trip_id": "20261022-231113-town05-perception-dropout-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 86.37,
+   "distance_m": 327.5,
+   "violations": [
+    "R2",
+    "R2"
+   ],
+   "counts": {
+    "critical": 0,
+    "warning": 2
+   },
+   "metrics": {
+    "max_speed_kph": 27.9,
+    "max_accel_mps2": 1.08,
+    "max_decel_mps2": 4.14,
+    "max_lat_accel_mps2": 0.81,
+    "min_gap_m": 5.01,
+    "min_ttc_s": 2.01,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 6.1,
+     "hazard": "phantom_obstacle",
+     "id": "hz-9"
+    },
+    {
+     "t_s": 9.0,
+     "hazard": "perception_dropout",
+     "id": "hz-10"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_perception_dropout",
+   "run": 3,
+   "trip_id": "20261022-231242-town05-perception-dropout-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 86.4,
+   "distance_m": 327.5,
+   "violations": [
+    "R2",
+    "R2",
+    "R2"
+   ],
+   "counts": {
+    "critical": 0,
+    "warning": 3
+   },
+   "metrics": {
+    "max_speed_kph": 27.9,
+    "max_accel_mps2": 1.26,
+    "max_decel_mps2": 4.1,
+    "max_lat_accel_mps2": 0.85,
+    "min_gap_m": 4.98,
+    "min_ttc_s": 1.96,
+    "max_obstacles": 1,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 6.2,
+     "hazard": "phantom_obstacle",
+     "id": "hz-11"
+    },
+    {
+     "t_s": 9.1,
+     "hazard": "perception_dropout",
+     "id": "hz-12"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_stop_resume_latency",
+   "run": 1,
+   "trip_id": "20261022-231411-town05-stop-resume-latency-r1",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 83.47,
+   "distance_m": 327.6,
+   "violations": [
+    "R2"
+   ],
+   "counts": {
+    "critical": 0,
+    "warning": 1
+   },
+   "metrics": {
+    "max_speed_kph": 26.8,
+    "max_accel_mps2": 1.1,
+    "max_decel_mps2": 4.8,
+    "max_lat_accel_mps2": 0.84,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 1.0,
+     "hazard": "command_latency",
+     "id": "hz-13"
+    },
+    {
+     "t_s": 12.0,
+     "action": "stop"
+    },
+    {
+     "t_s": 20.1,
+     "action": "resume"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_stop_resume_latency",
+   "run": 2,
+   "trip_id": "20261022-231537-town05-stop-resume-latency-r2",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 83.53,
+   "distance_m": 327.7,
+   "violations": [
+    "R2",
+    "R2"
+   ],
+   "counts": {
+    "critical": 0,
+    "warning": 2
+   },
+   "metrics": {
+    "max_speed_kph": 26.9,
+    "max_accel_mps2": 1.17,
+    "max_decel_mps2": 4.05,
+    "max_lat_accel_mps2": 0.92,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 1.0,
+     "hazard": "command_latency",
+     "id": "hz-14"
+    },
+    {
+     "t_s": 12.0,
+     "action": "stop"
+    },
+    {
+     "t_s": 20.0,
+     "action": "resume"
+    }
+   ]
+  },
+  {
+   "scenario": "town05_stop_resume_latency",
+   "run": 3,
+   "trip_id": "20261022-231703-town05-stop-resume-latency-r3",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "passed": true,
+   "failures": [],
+   "duration_s": 83.45,
+   "distance_m": 327.6,
+   "violations": [],
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   },
+   "metrics": {
+    "max_speed_kph": 26.8,
+    "max_accel_mps2": 1.18,
+    "max_decel_mps2": 3.93,
+    "max_lat_accel_mps2": 0.95,
+    "min_gap_m": null,
+    "min_ttc_s": null,
+    "max_obstacles": 0,
+    "estop_count": 0
+   },
+   "events": [
+    {
+     "t_s": 1.0,
+     "hazard": "command_latency",
+     "id": "hz-15"
+    },
+    {
+     "t_s": 12.2,
+     "action": "stop"
+    },
+    {
+     "t_s": 20.2,
+     "action": "resume"
+    }
+   ]
+  }
+ ]
+}

@@ -23,6 +23,12 @@ Commands:
   gear          gear = P|R|N|D                    (manual only)
   drive         throttle, brake, steer            (manual only, no reply,
                                                   sent ~20 Hz by the tablet)
+  traffic_start count, radius_m, [seed], [speed_factor]
+                                                  simulated vehicles around the car
+  traffic_stop / traffic_status
+  hazard_start  hazard_id, kind = phantom_obstacle|cut_in|perception_dropout,
+                params                            in-world hazards
+  hazard_stop   hazard_id
 
 Must stay compatible with the container's Python 3.6.
 """
@@ -62,6 +68,8 @@ from modules.common_msgs.perception_msgs.perception_obstacle_pb2 import (  # noq
 from modules.common_msgs.planning_msgs.planning_command_pb2 import (  # noqa: E402
     PlanningCommand)
 from modules.common_msgs.planning_msgs.planning_pb2 import ADCTrajectory  # noqa: E402
+
+from kairo_traffic import TrafficSim  # noqa: E402  (copied next to this file)
 
 GLOBAL_FLAGFILE = '/apollo/modules/common/data/global_flagfile.txt'
 TELEMETRY_PERIOD_S = 0.1
@@ -189,6 +197,11 @@ class MapCache(object):
         self.map_dir = None
         self.lanes = {}  # lane id -> [(x, y), ...] full resolution
         self.lane_boxes = {}  # lane id -> (min_x, min_y, max_x, max_y)
+        # Lane graph for the traffic simulation (ids of lanes kept above).
+        self.successors = {}
+        self.left_neighbors = {}   # same-direction lanes only
+        self.right_neighbors = {}
+        self.speed_limits = {}     # m/s; 0/missing on most CARLA lanes
         self.payload = None
 
     def ensure(self):
@@ -206,6 +219,18 @@ class MapCache(object):
                           [s.width for s in lane.right_sample]
                 widths[lane.id.id] = (sum(samples) / len(samples) * 2) \
                     if samples else 3.5
+            def kept(ids):
+                return [i.id for i in ids if i.id in lanes]
+            self.successors, self.left_neighbors, self.right_neighbors = {}, {}, {}
+            self.speed_limits = {}
+            for lane in hd_map.lane:
+                lid = lane.id.id
+                if lid not in lanes:
+                    continue
+                self.successors[lid] = kept(lane.successor_id)
+                self.left_neighbors[lid] = kept(lane.left_neighbor_forward_lane_id)
+                self.right_neighbors[lid] = kept(lane.right_neighbor_forward_lane_id)
+                self.speed_limits[lid] = lane.speed_limit
             self.lanes = lanes
             self.lane_boxes = {
                 lane_id: (min(p[0] for p in pts), min(p[1] for p in pts),
@@ -550,7 +575,17 @@ class Daemon(object):
         self.chassis_client = n.create_client(
             '/apollo/external_command/chassis', ChassisCommand, CommandStatus)
         self.vehicle = VirtualVehicle(n)
+        self.traffic = TrafficSim(n, self.map_cache, self.ego_for_traffic)
+        # A daemon that died while traffic ran left Sim Control's dummy
+        # predictions switched off; give /apollo/prediction back to it.
+        self.traffic.release_prediction()
         self._static_sent = {}  # key -> (value object, time sent)
+
+    def ego_for_traffic(self):
+        with _state_lock:
+            speed = (self.chassis or {}).get('speed_mps') or 0.0
+            route = (self.route or {}).get('polyline')
+            return self.pose, speed, route
 
     def _mark(self, channel):
         self.last_rx[channel] = time.time()
@@ -706,6 +741,9 @@ class Daemon(object):
 
     def snapshot(self):
         now = time.time()
+        # Outside _state_lock: the traffic thread takes its own lock first
+        # and then _state_lock (for the ego pose); never the other way round.
+        traffic = self.traffic.summary()
         with _state_lock:
             ages = {k: round(now - v, 2) for k, v in self.last_rx.items()}
             snap = {
@@ -718,6 +756,7 @@ class Daemon(object):
                 'command_status': self.command_status,
                 'channel_age_s': ages,
                 'manual': self.vehicle.snapshot(),
+                'traffic': traffic,
             }
             static = {'hmi': self.hmi, 'route': self.route}
         # HMI status and the route are large and rarely change: include them
@@ -864,6 +903,24 @@ class Daemon(object):
         return self.map_cache.snap(float(req['x']), float(req['y']),
                                    float(req.get('radius', 25.0)),
                                    None if heading is None else float(heading))
+
+    def cmd_traffic_start(self, req):
+        return self.traffic.start_traffic(
+            count=int(req.get('count', 8)), radius=float(req.get('radius_m', 150.0)),
+            seed=req.get('seed'), speed_factor=float(req.get('speed_factor', 1.0)))
+
+    def cmd_traffic_stop(self, _req):
+        return self.traffic.stop_traffic()
+
+    def cmd_traffic_status(self, _req):
+        return self.traffic.status()
+
+    def cmd_hazard_start(self, req):
+        return self.traffic.start_hazard(req['hazard_id'], req['kind'],
+                                         req.get('params') or {})
+
+    def cmd_hazard_stop(self, req):
+        return self.traffic.stop_hazard(req['hazard_id'])
 
     def cmd_map_lanes(self, _req):
         payload = self.map_cache.ensure()

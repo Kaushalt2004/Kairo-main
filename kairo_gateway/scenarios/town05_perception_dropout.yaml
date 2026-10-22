@@ -1,0 +1,12 @@
+name: town05_perception_dropout
+description: Stalled car ahead, then perception drops out for 2 s while the car approaches it
+start: map_start
+destination: {x: -155.5, y: -91.7}
+cruise_kph: 30
+timeout_s: 200
+hazards:
+  - {at_s: 6, type: phantom_obstacle, ahead_m: 45, duration_s: 15}
+  - {at_s: 9, type: perception_dropout, duration_s: 2}
+expect:
+  forbid: [R11]
+repeat: 3

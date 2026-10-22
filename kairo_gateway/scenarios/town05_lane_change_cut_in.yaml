@@ -1,0 +1,12 @@
+name: town05_lane_change_cut_in
+description: Straight route; a slower vehicle in the neighbouring lane cuts in ahead of the car
+start: map_start
+destination: {x: -120.0, y: 4.2}
+cruise_kph: 30
+timeout_s: 150
+hazards:
+  - {at_s: 11, type: cut_in, ahead_m: 28, speed_factor: 0.4, delay_s: 1, change_s: 2.5, duration_s: 25}
+expect:
+  verdict: PASS
+  forbid: [R11]
+repeat: 3

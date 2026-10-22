@@ -53,3 +53,6 @@ apollo/dumps/
 *.iml
 vehicle_tablet_ui_segregated/dart_defines.json
 kairo_gateway/data/
+
+# Black book, poster and reference reports (kept local)
+report/

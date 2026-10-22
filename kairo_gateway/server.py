@@ -7,6 +7,12 @@
 REST commands answer with the new state; /ws pushes the state (10x/second
 while the car moves, otherwise only on change) and accepts pedal/steering
 input while driving manually:  {"type": "drive", "throttle", "brake", "steer"}
+
+Validation services (see docs/validation_api.md):
+  /api/traffic    simulated vehicles around the car (kairo_traffic.py)
+  /api/hazards    hazard injection (hazards.py)
+  /api/safety     live safety status and per-trip reports (safety.py)
+  /api/scenarios  YAML scenario batches and benchmarks (scenarios.py)
 """
 
 import asyncio
@@ -14,7 +20,9 @@ import json
 import logging
 import math
 import os
+import threading
 import time
+from collections import deque
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -24,8 +32,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel, Field
 
+from . import scenarios as scn
 from .cyber_bridge import CyberBridge
 from .dreamview import DreamviewClient, DreamviewError
+from .hazards import HazardError, HazardManager
+from .safety import RULES, SafetyValidator
 from .vehicle_body import SIGNAL_FIELDS, BodyError, VehicleBody
 
 log = logging.getLogger("kairo.gateway")
@@ -54,6 +65,22 @@ class GoRequest(BaseModel):
     heading: Optional[float] = None
     name: Optional[str] = None
     target_speed_kph: Optional[float] = Field(None, gt=0, le=120)
+    # Set by the scenario runner; recorded in the trip's safety report.
+    scenario: Optional[str] = None
+    run: Optional[int] = None
+    timeout_s: Optional[float] = Field(None, gt=0, le=3600)
+
+
+class TrafficRequest(BaseModel):
+    count: int = Field(8, ge=1, le=40)
+    radius_m: float = Field(150.0, ge=20, le=500)
+    seed: Optional[int] = None
+    speed_factor: float = Field(1.0, ge=0.3, le=1.5)
+
+
+class ScenarioRunRequest(BaseModel):
+    names: List[str] = []           # empty: every scenario
+    repeat: Optional[int] = Field(None, ge=1, le=50)
 
 
 class NameRequest(BaseModel):
@@ -120,6 +147,9 @@ class Gateway:
         self.signal_status: Optional[Dict[str, Any]] = None
         self._mode_lock = asyncio.Lock()
         self._last_drive_input = 0.0
+        self.hazards = HazardManager(self.cyber.request)
+        self.safety = SafetyValidator(DATA_DIR / "reports")
+        self._safety_ts: Optional[float] = None  # telemetry sample last validated
 
     # ---- places (per HD map) ---------------------------------------------
 
@@ -232,6 +262,9 @@ class Gateway:
             },
             "body": self.body.state,
             "signal_status": self.signal_status,
+            "safety": self.safety.live(),
+            "hazards": self.hazards.summary(),
+            "traffic": t.get("traffic") if self.cyber.connected else None,
             "dreamview": {
                 "mode": hmi.get("current_mode"),
                 "modes": hmi.get("modes") or [],
@@ -575,6 +608,7 @@ class Gateway:
     # ---- autopilot ------------------------------------------------------------
 
     async def go(self, req: GoRequest) -> Dict[str, Any]:
+        await self._command_latency()
         if self.manual:
             await self.set_manual(False)  # engage autopilot from manual
             await asyncio.sleep(0.5)
@@ -593,9 +627,21 @@ class Gateway:
         self.target_speed_kph = req.target_speed_kph
         self.stop_requested = False
         self._record("GO", result)
+        self._safety_ts = None
+        self.safety.start_trip(
+            destination=dict(self.destination), name=self.destination["name"],
+            target_speed_kph=req.target_speed_kph, map=self.current_map(),
+            scenario=req.scenario, run=req.run, timeout_s=req.timeout_s)
         return result
 
+    async def _command_latency(self) -> None:
+        """command_latency hazard: hold trip commands back."""
+        delay = self.hazards.command_delay_s()
+        if delay > 0:
+            await asyncio.sleep(delay)
+
     async def action(self, command: str) -> Dict[str, Any]:
+        await self._command_latency()
         result = await self.cyber.request("action", timeout=10, command=command)
         if command in ("STOP", "PULL_OVER"):
             self.stop_requested = True
@@ -680,6 +726,8 @@ class StateBroadcaster:
             moving = snapshot["vehicle"]["speed_kph"] > 0.3 or gw.manual
             period = STATE_PUSH_PERIOD_S if moving else IDLE_PUSH_PERIOD_S
             del snapshot["ts"]
+            if gw.hazards.telemetry_paused():
+                continue  # telemetry_dropout hazard: tablets get nothing
             body = json.dumps(snapshot, separators=(",", ":"))
             now = time.time()
             if body == last_body and now - last_sent < self.KEEPALIVE_S:
@@ -700,6 +748,79 @@ gw: Gateway
 broadcaster = StateBroadcaster()
 
 
+async def safety_loop() -> None:
+    """Feeds each new telemetry sample of an active trip to the validator
+    and expires hazards."""
+    while True:
+        await asyncio.sleep(0.1)
+        try:
+            gw.hazards.tick()
+            if not gw.safety.active:
+                continue
+            ts = (gw.cyber.telemetry or {}).get("ts")
+            if ts == gw._safety_ts and gw.cyber.connected:
+                continue  # nothing new from Apollo
+            gw._safety_ts = ts
+            report = gw.safety.sample(gw.state(include_route=False), gw.hazards)
+            if report is not None:
+                log.info("Trip %s: %s (%s), %d critical / %d warning", report["trip_id"],
+                         report["verdict"], report["end_reason"], report["counts"]["critical"],
+                         report["counts"]["warning"])
+                broadcaster.kick()
+        except Exception:  # noqa: BLE001 - never let validation kill the loop
+            log.exception("safety loop failed")
+
+
+class BatchManager:
+    """Runs one scenario batch at a time in a background thread. The runner
+    drives the gateway through its own HTTP API, like any other client."""
+
+    def __init__(self) -> None:
+        self.thread: Optional[threading.Thread] = None
+        self.runner: Optional[scn.ScenarioRunner] = None
+        self.stop_requested = False
+        self.log: deque = deque(maxlen=300)
+        self.last_summary: Optional[Dict[str, Any]] = None
+        self.error: Optional[str] = None
+
+    @property
+    def running(self) -> bool:
+        return self.thread is not None and self.thread.is_alive()
+
+    def _log(self, line: str) -> None:
+        self.log.append(f"{time.strftime('%H:%M:%S')} {line}")
+        log.info("scenario: %s", line)
+
+    def start(self, scenarios: List[Dict[str, Any]], repeat: Optional[int]) -> None:
+        if self.running:
+            raise HTTPException(409, "A scenario batch is already running")
+        port = int(os.getenv("KAIRO_GATEWAY_PORT", "8090"))
+        self.stop_requested = False
+        self.error = None
+        self.log.clear()
+        self.runner = scn.ScenarioRunner(scn.GatewayClient(f"http://127.0.0.1:{port}"),
+                                         log=self._log, should_stop=lambda: self.stop_requested)
+
+        def work() -> None:
+            try:
+                self.last_summary = self.runner.run_batch(scenarios, repeat)
+            except Exception as e:  # noqa: BLE001
+                self.error = str(e)
+                self._log(f"batch failed: {e}")
+
+        self.thread = threading.Thread(target=work, daemon=True, name="scenario-batch")
+        self.thread.start()
+
+    def status(self) -> Dict[str, Any]:
+        return {"running": self.running, "stop_requested": self.stop_requested,
+                "progress": self.runner.progress if self.runner else None,
+                "error": self.error, "log": list(self.log)[-40:],
+                "last_summary": self.last_summary}
+
+
+batches = BatchManager()
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     global gw
@@ -708,6 +829,7 @@ async def lifespan(_app: FastAPI):
     gw.dreamview.start()
     broadcaster.start()
     asyncio.create_task(gw.restore_vehicle())
+    asyncio.create_task(safety_loop())
     log.info("KAIRO gateway up (container=%s, dreamview=%s)", CONTAINER, DREAMVIEW_WS)
     yield
     broadcaster.stop()
@@ -907,6 +1029,131 @@ def delete_place(place_id: str):
     if map_name:
         gw.delete_place(map_name, place_id)
     return {"ok": True, "places": gw.places_for(map_name)}
+
+
+# ---- simulated traffic ------------------------------------------------------------
+
+@app.get("/api/traffic")
+async def traffic_status():
+    try:
+        return await gw.cyber.request("traffic_status", timeout=10)
+    except RuntimeError as e:
+        raise HTTPException(502, f"Apollo: {e}") from e
+
+
+@app.post("/api/traffic/start")
+async def traffic_start(req: TrafficRequest):
+    modules = ((gw.cyber.telemetry or {}).get("hmi") or {}).get("modules") or {}
+    if modules.get("Prediction"):
+        raise HTTPException(409, "Stop Apollo's Prediction module first: simulated "
+                                 "traffic publishes the predictions itself.")
+    return await _run(gw.cyber.request("traffic_start", timeout=30, **req.model_dump()))
+
+
+@app.post("/api/traffic/stop")
+async def traffic_stop():
+    return await _run(gw.cyber.request("traffic_stop", timeout=10))
+
+
+# ---- hazard injection ---------------------------------------------------------------
+
+@app.get("/api/hazards")
+def hazards_list():
+    gw.hazards.tick()
+    return gw.hazards.listing()
+
+
+@app.post("/api/hazards")
+async def hazard_start(body: Dict[str, Any]):
+    params = dict(body)
+    kind = params.pop("type", None)
+    try:
+        rec = await gw.hazards.start(str(kind), params)
+    except HazardError as e:
+        raise HTTPException(422, str(e)) from e
+    except RuntimeError as e:
+        raise HTTPException(409, f"Apollo: {e}") from e
+    broadcaster.kick()
+    return {"ok": True, "hazard": rec}
+
+
+@app.delete("/api/hazards/{hazard_id}")
+async def hazard_stop(hazard_id: str):
+    try:
+        rec = await gw.hazards.stop(hazard_id)
+    except HazardError as e:
+        raise HTTPException(404, str(e)) from e
+    broadcaster.kick()
+    return {"ok": True, "hazard": rec}
+
+
+@app.post("/api/hazards/clear")
+async def hazards_clear():
+    stopped = await gw.hazards.clear()
+    broadcaster.kick()
+    return {"ok": True, "stopped": [r["id"] for r in stopped]}
+
+
+# ---- safety validation ----------------------------------------------------------------
+
+@app.get("/api/safety")
+def safety_live():
+    return {**gw.safety.live(), "rules": RULES}
+
+
+@app.get("/api/safety/reports")
+def safety_reports(limit: int = 50):
+    return {"reports": gw.safety.list_reports(min(max(limit, 1), 500))}
+
+
+@app.get("/api/safety/reports/{trip_id}")
+def safety_report(trip_id: str):
+    report = gw.safety.get_report(trip_id)
+    if report is None:
+        raise HTTPException(404, f"No report '{trip_id}'")
+    return report
+
+
+# ---- scenarios and benchmarks -----------------------------------------------------------
+
+@app.get("/api/scenarios")
+def scenarios_list():
+    return {"scenarios": scn.list_scenarios()}
+
+
+@app.post("/api/scenarios/run")
+def scenarios_run(req: ScenarioRunRequest):
+    names = req.names or [s["id"] for s in scn.list_scenarios() if "error" not in s]
+    try:
+        scenarios = [scn.find(n) for n in names]
+    except scn.ScenarioError as e:
+        raise HTTPException(422, str(e)) from e
+    batches.start(scenarios, req.repeat)
+    return {"ok": True, **batches.status()}
+
+
+@app.get("/api/scenarios/batch")
+def scenarios_batch():
+    return batches.status()
+
+
+@app.post("/api/scenarios/stop")
+def scenarios_stop():
+    batches.stop_requested = True
+    return {"ok": True, **batches.status()}
+
+
+@app.get("/api/benchmarks")
+def benchmarks_list():
+    return {"benchmarks": scn.list_benchmarks()}
+
+
+@app.get("/api/benchmarks/{batch_id}")
+def benchmark_get(batch_id: str):
+    path = scn.BENCHMARK_DIR / f"{batch_id}.json"
+    if "/" in batch_id or "\\" in batch_id or not path.exists():
+        raise HTTPException(404, f"No benchmark '{batch_id}'")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 # ---- live state stream ---------------------------------------------------------

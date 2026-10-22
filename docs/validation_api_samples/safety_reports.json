@@ -1,0 +1,344 @@
+{
+ "reports": [
+  {
+   "trip_id": "20261022-231831-town05-demo-traffic-hazards-r1",
+   "scenario": "town05_demo_traffic_hazards",
+   "run": 1,
+   "name": "town05_demo_traffic_hazards",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792691311.72,
+   "started_at_iso": "2026-10-22T23:18:31",
+   "duration_s": 87.62,
+   "distance_m": 327.9,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-231703-town05-stop-resume-latency-r3",
+   "scenario": "town05_stop_resume_latency",
+   "run": 3,
+   "name": "town05_stop_resume_latency",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792691223.473,
+   "started_at_iso": "2026-10-22T23:17:03",
+   "duration_s": 83.45,
+   "distance_m": 327.6,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-231537-town05-stop-resume-latency-r2",
+   "scenario": "town05_stop_resume_latency",
+   "run": 2,
+   "name": "town05_stop_resume_latency",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792691137.309,
+   "started_at_iso": "2026-10-22T23:15:37",
+   "duration_s": 83.53,
+   "distance_m": 327.7,
+   "counts": {
+    "critical": 0,
+    "warning": 2
+   }
+  },
+  {
+   "trip_id": "20261022-231411-town05-stop-resume-latency-r1",
+   "scenario": "town05_stop_resume_latency",
+   "run": 1,
+   "name": "town05_stop_resume_latency",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792691051.174,
+   "started_at_iso": "2026-10-22T23:14:11",
+   "duration_s": 83.47,
+   "distance_m": 327.6,
+   "counts": {
+    "critical": 0,
+    "warning": 1
+   }
+  },
+  {
+   "trip_id": "20261022-231242-town05-perception-dropout-r3",
+   "scenario": "town05_perception_dropout",
+   "run": 3,
+   "name": "town05_perception_dropout",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690962.125,
+   "started_at_iso": "2026-10-22T23:12:42",
+   "duration_s": 86.4,
+   "distance_m": 327.5,
+   "counts": {
+    "critical": 0,
+    "warning": 3
+   }
+  },
+  {
+   "trip_id": "20261022-231113-town05-perception-dropout-r2",
+   "scenario": "town05_perception_dropout",
+   "run": 2,
+   "name": "town05_perception_dropout",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690873.031,
+   "started_at_iso": "2026-10-22T23:11:13",
+   "duration_s": 86.37,
+   "distance_m": 327.5,
+   "counts": {
+    "critical": 0,
+    "warning": 2
+   }
+  },
+  {
+   "trip_id": "20261022-230943-town05-perception-dropout-r1",
+   "scenario": "town05_perception_dropout",
+   "run": 1,
+   "name": "town05_perception_dropout",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690783.8,
+   "started_at_iso": "2026-10-22T23:09:43",
+   "duration_s": 86.48,
+   "distance_m": 327.6,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230901-town05-lane-change-cut-in-r3",
+   "scenario": "town05_lane_change_cut_in",
+   "run": 3,
+   "name": "town05_lane_change_cut_in",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690741.62,
+   "started_at_iso": "2026-10-22T23:09:01",
+   "duration_s": 39.57,
+   "distance_m": 142.2,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230820-town05-lane-change-cut-in-r2",
+   "scenario": "town05_lane_change_cut_in",
+   "run": 2,
+   "name": "town05_lane_change_cut_in",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690700.237,
+   "started_at_iso": "2026-10-22T23:08:20",
+   "duration_s": 38.7,
+   "distance_m": 142.2,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230738-town05-lane-change-cut-in-r1",
+   "scenario": "town05_lane_change_cut_in",
+   "run": 1,
+   "name": "town05_lane_change_cut_in",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690658.674,
+   "started_at_iso": "2026-10-22T23:07:38",
+   "duration_s": 38.83,
+   "distance_m": 142.2,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230703-town05-lane-change-clear-r3",
+   "scenario": "town05_lane_change_clear",
+   "run": 3,
+   "name": "town05_lane_change_clear",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690623.218,
+   "started_at_iso": "2026-10-22T23:07:03",
+   "duration_s": 32.73,
+   "distance_m": 142.2,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230627-town05-lane-change-clear-r2",
+   "scenario": "town05_lane_change_clear",
+   "run": 2,
+   "name": "town05_lane_change_clear",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690587.774,
+   "started_at_iso": "2026-10-22T23:06:27",
+   "duration_s": 32.7,
+   "distance_m": 142.2,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230552-town05-lane-change-clear-r1",
+   "scenario": "town05_lane_change_clear",
+   "run": 1,
+   "name": "town05_lane_change_clear",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690552.497,
+   "started_at_iso": "2026-10-22T23:05:52",
+   "duration_s": 32.64,
+   "distance_m": 142.2,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230435-town05-corner-traffic-r5",
+   "scenario": "town05_corner_traffic",
+   "run": 5,
+   "name": "town05_corner_traffic",
+   "map": "Carla Town05",
+   "verdict": "FAIL",
+   "end_reason": "error",
+   "started_at": 1792690475.156,
+   "started_at_iso": "2026-10-22T23:04:35",
+   "duration_s": 74.7,
+   "distance_m": 286.0,
+   "counts": {
+    "critical": 2,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230316-town05-corner-traffic-r4",
+   "scenario": "town05_corner_traffic",
+   "run": 4,
+   "name": "town05_corner_traffic",
+   "map": "Carla Town05",
+   "verdict": "FAIL",
+   "end_reason": "arrived",
+   "started_at": 1792690396.367,
+   "started_at_iso": "2026-10-22T23:03:16",
+   "duration_s": 75.04,
+   "distance_m": 327.5,
+   "counts": {
+    "critical": 1,
+    "warning": 1
+   }
+  },
+  {
+   "trip_id": "20261022-230157-town05-corner-traffic-r3",
+   "scenario": "town05_corner_traffic",
+   "run": 3,
+   "name": "town05_corner_traffic",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690317.88,
+   "started_at_iso": "2026-10-22T23:01:57",
+   "duration_s": 74.79,
+   "distance_m": 327.5,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-230042-town05-corner-traffic-r2",
+   "scenario": "town05_corner_traffic",
+   "run": 2,
+   "name": "town05_corner_traffic",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690242.843,
+   "started_at_iso": "2026-10-22T23:00:42",
+   "duration_s": 71.2,
+   "distance_m": 327.5,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-225927-town05-corner-traffic-r1",
+   "scenario": "town05_corner_traffic",
+   "run": 1,
+   "name": "town05_corner_traffic",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690167.396,
+   "started_at_iso": "2026-10-22T22:59:27",
+   "duration_s": 71.65,
+   "distance_m": 327.4,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-225808-town05-corner-phantom-r3",
+   "scenario": "town05_corner_phantom",
+   "run": 3,
+   "name": "town05_corner_phantom",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690088.429,
+   "started_at_iso": "2026-10-22T22:58:08",
+   "duration_s": 75.17,
+   "distance_m": 327.9,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  },
+  {
+   "trip_id": "20261022-225650-town05-corner-phantom-r2",
+   "scenario": "town05_corner_phantom",
+   "run": 2,
+   "name": "town05_corner_phantom",
+   "map": "Carla Town05",
+   "verdict": "PASS",
+   "end_reason": "arrived",
+   "started_at": 1792690010.077,
+   "started_at_iso": "2026-10-22T22:56:50",
+   "duration_s": 75.56,
+   "distance_m": 328.0,
+   "counts": {
+    "critical": 0,
+    "warning": 0
+   }
+  }
+ ]
+}

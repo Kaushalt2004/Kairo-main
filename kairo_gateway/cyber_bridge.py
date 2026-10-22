@@ -21,8 +21,11 @@ log = logging.getLogger("kairo.cyber")
 
 DAEMON_SRC = Path(__file__).with_name("cyber_daemon.py")
 DAEMON_DST = "/tmp/kairo_cyber_daemon.py"
+# Modules the daemon imports, copied next to it.
+DAEMON_MODULES = [Path(__file__).with_name("kairo_traffic.py")]
 
 HEARTBEAT_S = 5.0
+STALL_RESTART_S = 20.0  # parked telemetry still arrives twice a second
 
 _LAUNCH = (
     # A daemon whose gateway was killed can outlive it; never run two.
@@ -74,6 +77,13 @@ class CyberBridge:
             proc = self._proc
             if proc is None or proc.poll() is not None:
                 continue
+            if self.telemetry_at and time.time() - self.telemetry_at > STALL_RESTART_S:
+                # Alive but silent (stuck): kill it; _run_forever restarts it.
+                log.warning("Cyber daemon sent no telemetry for %.0f s; restarting it",
+                            time.time() - self.telemetry_at)
+                self.telemetry_at = 0.0
+                proc.kill()
+                continue
             try:
                 with self._write_lock:
                     proc.stdin.write(b'{"cmd":"heartbeat"}\n')
@@ -110,10 +120,12 @@ class CyberBridge:
             self._stop.wait(backoff)
 
     def _run_once(self) -> None:
-        subprocess.run(
-            ["docker", "cp", str(DAEMON_SRC), f"{self.container}:{DAEMON_DST}"],
-            check=True, capture_output=True, timeout=30,
-        )
+        for src, dst in [(DAEMON_SRC, DAEMON_DST)] + [
+                (m, "/tmp/" + m.name) for m in DAEMON_MODULES]:
+            subprocess.run(
+                ["docker", "cp", str(src), f"{self.container}:{dst}"],
+                check=True, capture_output=True, timeout=30,
+            )
         log.info("Starting Cyber daemon in container %s", self.container)
         self._proc = subprocess.Popen(
             ["docker", "exec", "-i", self.container, "bash", "-c", _LAUNCH],

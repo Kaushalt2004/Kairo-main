@@ -80,6 +80,26 @@ Lights, signals and the horn are also sent to Apollo as a `ChassisCommand`. This
 
 Environment variables: `KAIRO_APOLLO_CONTAINER` (default `apollo_dev_kairo_it37`), `KAIRO_DREAMVIEW_WS`, `KAIRO_GATEWAY_PORT` (default `8090`).
 
+## Validation: traffic, hazards, safety reports, scenarios
+
+The full contract for these endpoints is in [`docs/validation_api.md`](../docs/validation_api.md).
+
+- **Simulated traffic** (`kairo_traffic.py`, which runs in the container next to the daemon). `POST /api/traffic/start {count, radius_m, seed}` spawns cars around the ego. They drive along the HD map lanes, follow each other with the Intelligent Driver Model, and always yield to the ego car. They appear in Dreamview, on the tablet map, and to Apollo's planning. Traffic publishes `/apollo/perception/obstacles` and `/apollo/prediction` itself, so Apollo's Prediction module must stay off. When traffic stops, prediction is handed back to Sim Control's dummy publisher.
+- **Hazards** (`hazards.py`). `POST /api/hazards {type, ...}` with the following types:
+  - In the world: `phantom_obstacle`, `cut_in`, `perception_dropout`.
+  - On the tablet link: `telemetry_dropout`, `command_latency`.
+
+  Every hazard has an id and a time window, and the window shows up in the trip's safety report.
+- **Safety validator** (`safety.py`). Every trip started with `go` is checked against rules R1–R11 at about 10 Hz. When it ends, a JSON report is written to `data/reports/<trip_id>.json`. `GET /api/safety` gives the live status, and `GET /api/safety/reports` gives the reports.
+- **Scenarios** (`scenarios.py`, with YAML files in `scenarios/`). These are repeatable runs with traffic, timed hazards, operator actions and expectations. Run them from the command line or through `POST /api/scenarios/run`. A batch writes `data/benchmarks/<batch_id>.json` and `.md`.
+
+```
+python -m kairo_gateway.scenarios --list
+python -m kairo_gateway.scenarios                      # every scenario, its own repeat count
+python -m kairo_gateway.scenarios town05_corner_phantom --repeat 5
+python -m pytest tests/test_validation.py              # validator, hazards and runner logic, no Apollo needed
+```
+
 ## Performance
 
 Measured on this setup (12 cores, 16 GB):
