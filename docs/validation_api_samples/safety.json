@@ -1,0 +1,121 @@
+{
+ "active": false,
+ "last_report": {
+  "trip_id": "20261022-231831-town05-demo-traffic-hazards-r1",
+  "scenario": "town05_demo_traffic_hazards",
+  "run": 1,
+  "name": "town05_demo_traffic_hazards",
+  "map": "Carla Town05",
+  "verdict": "PASS",
+  "end_reason": "arrived",
+  "started_at": 1792691311.72,
+  "started_at_iso": "2026-10-22T23:18:31",
+  "duration_s": 87.62,
+  "distance_m": 327.9,
+  "counts": {
+   "critical": 0,
+   "warning": 0
+  }
+ },
+ "rules": [
+  {
+   "id": "R1",
+   "name": "Over-speed",
+   "severity": "warning",
+   "threshold": 1.1,
+   "unit": "x cruise",
+   "min_duration_s": 1.0,
+   "description": "Speed above the cruise setting by more than 10 %"
+  },
+  {
+   "id": "R2",
+   "name": "Harsh braking",
+   "severity": "warning",
+   "threshold": 4.0,
+   "unit": "m/s\u00b2",
+   "min_duration_s": 0.0,
+   "description": "Deceleration above 4 m/s\u00b2"
+  },
+  {
+   "id": "R3",
+   "name": "Emergency braking",
+   "severity": "critical",
+   "threshold": 6.0,
+   "unit": "m/s\u00b2",
+   "min_duration_s": 0.0,
+   "description": "Deceleration above 6 m/s\u00b2"
+  },
+  {
+   "id": "R4",
+   "name": "Harsh acceleration",
+   "severity": "warning",
+   "threshold": 3.0,
+   "unit": "m/s\u00b2",
+   "min_duration_s": 0.0,
+   "description": "Acceleration above 3 m/s\u00b2"
+  },
+  {
+   "id": "R5",
+   "name": "Lateral acceleration",
+   "severity": "warning",
+   "threshold": 3.0,
+   "unit": "m/s\u00b2",
+   "min_duration_s": 0.5,
+   "description": "Lateral acceleration above 3 m/s\u00b2"
+  },
+  {
+   "id": "R6",
+   "name": "Obstacle proximity",
+   "severity": "critical",
+   "threshold": 2.0,
+   "unit": "m",
+   "min_duration_s": 0.3,
+   "description": "Gap to an obstacle in the car's path below 2 m"
+  },
+  {
+   "id": "R7",
+   "name": "Time to collision",
+   "severity": "critical",
+   "threshold": 1.5,
+   "unit": "s",
+   "min_duration_s": 0.3,
+   "description": "Time to collision with an obstacle ahead below 1.5 s"
+  },
+  {
+   "id": "R8",
+   "name": "Planner emergency stop",
+   "severity": "warning",
+   "threshold": null,
+   "unit": null,
+   "min_duration_s": 0.0,
+   "description": "The planner reported an emergency stop"
+  },
+  {
+   "id": "R9",
+   "name": "Stall",
+   "severity": "critical",
+   "threshold": 10.0,
+   "unit": "s",
+   "min_duration_s": 10.0,
+   "description": "Not moving for over 10 s while driving, with no deliberate stop and nothing close ahead, or trip ended in ERROR"
+  },
+  {
+   "id": "R10",
+   "name": "Route completion",
+   "severity": "critical",
+   "threshold": null,
+   "unit": "s",
+   "min_duration_s": 0.0,
+   "description": "Not arrived within the trip's time limit"
+  },
+  {
+   "id": "R11",
+   "name": "Collision",
+   "severity": "critical",
+   "threshold": 0.0,
+   "unit": "m",
+   "min_duration_s": 0.0,
+   "description": "The car's footprint overlaps an obstacle"
+  }
+ ]
+}

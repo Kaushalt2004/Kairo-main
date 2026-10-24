@@ -1,0 +1,10 @@
+name: town05_lane_change_clear
+description: Straight route that ends in the neighbouring lane, so Apollo must change lanes (baseline)
+start: map_start
+destination: {x: -120.0, y: 4.2}
+cruise_kph: 30
+timeout_s: 150
+expect:
+  verdict: PASS
+  max_duration_s: 90
+repeat: 3

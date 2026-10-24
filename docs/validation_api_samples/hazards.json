@@ -1,0 +1,374 @@
+{
+ "types": {
+  "phantom_obstacle": {
+   "where": "world",
+   "description": "Static object placed ahead of the car on its route",
+   "defaults": {
+    "ahead_m": 25.0,
+    "duration_s": 10.0,
+    "object": "vehicle"
+   }
+  },
+  "cut_in": {
+   "where": "world",
+   "description": "Vehicle in the neighbouring lane merges in front of the car",
+   "defaults": {
+    "ahead_m": 25.0,
+    "side": "auto",
+    "speed_factor": 0.6,
+    "delay_s": 1.0,
+    "change_s": 3.0,
+    "duration_s": 15.0
+   }
+  },
+  "perception_dropout": {
+   "where": "world",
+   "description": "All obstacles disappear for a while, then come back",
+   "defaults": {
+    "duration_s": 2.0
+   }
+  },
+  "telemetry_dropout": {
+   "where": "gateway",
+   "description": "State stream to the tablets pauses",
+   "defaults": {
+    "duration_s": 3.0
+   }
+  },
+  "command_latency": {
+   "where": "gateway",
+   "description": "Trip commands are delayed before they reach Apollo",
+   "defaults": {
+    "delay_ms": 800.0,
+    "duration_s": 30.0
+   }
+  }
+ },
+ "active": [],
+ "recent": [
+  {
+   "id": "hz-18",
+   "type": "telemetry_dropout",
+   "where": "gateway",
+   "params": {
+    "duration_s": 3
+   },
+   "started_at": 1792691356.877,
+   "ends_at": 1792691359.877,
+   "ended_at": 1792691359.877,
+   "status": "expired",
+   "result": null
+  },
+  {
+   "id": "hz-17",
+   "type": "perception_dropout",
+   "where": "world",
+   "params": {
+    "duration_s": 2
+   },
+   "started_at": 1792691341.799,
+   "ends_at": 1792691343.799,
+   "ended_at": 1792691343.799,
+   "status": "expired",
+   "result": {
+    "until": 1792691343.8018153
+   }
+  },
+  {
+   "id": "hz-16",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 35,
+    "duration_s": 12,
+    "object": "vehicle"
+   },
+   "started_at": 1792691319.818,
+   "ends_at": 1792691331.818,
+   "ended_at": 1792691331.818,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20007,
+    "x": -41.3,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  },
+  {
+   "id": "hz-15",
+   "type": "command_latency",
+   "where": "gateway",
+   "params": {
+    "delay_ms": 800,
+    "duration_s": 40
+   },
+   "started_at": 1792691224.527,
+   "ends_at": 1792691264.527,
+   "ended_at": 1792691264.527,
+   "status": "expired",
+   "result": null
+  },
+  {
+   "id": "hz-14",
+   "type": "command_latency",
+   "where": "gateway",
+   "params": {
+    "delay_ms": 800,
+    "duration_s": 40
+   },
+   "started_at": 1792691138.338,
+   "ends_at": 1792691178.338,
+   "ended_at": 1792691178.338,
+   "status": "expired",
+   "result": null
+  },
+  {
+   "id": "hz-13",
+   "type": "command_latency",
+   "where": "gateway",
+   "params": {
+    "delay_ms": 800,
+    "duration_s": 40
+   },
+   "started_at": 1792691052.228,
+   "ends_at": 1792691092.228,
+   "ended_at": 1792691092.228,
+   "status": "expired",
+   "result": null
+  },
+  {
+   "id": "hz-12",
+   "type": "perception_dropout",
+   "where": "world",
+   "params": {
+    "duration_s": 2
+   },
+   "started_at": 1792690971.256,
+   "ends_at": 1792690973.256,
+   "ended_at": 1792690973.256,
+   "status": "expired",
+   "result": {
+    "until": 1792690973.2580736
+   }
+  },
+  {
+   "id": "hz-11",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 45,
+    "duration_s": 15,
+    "object": "vehicle"
+   },
+   "started_at": 1792690968.309,
+   "ends_at": 1792690983.309,
+   "ended_at": 1792690983.309,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20006,
+    "x": -40.7,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  },
+  {
+   "id": "hz-10",
+   "type": "perception_dropout",
+   "where": "world",
+   "params": {
+    "duration_s": 2
+   },
+   "started_at": 1792690882.044,
+   "ends_at": 1792690884.044,
+   "ended_at": 1792690884.044,
+   "status": "expired",
+   "result": {
+    "until": 1792690884.0468905
+   }
+  },
+  {
+   "id": "hz-9",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 45,
+    "duration_s": 15,
+    "object": "vehicle"
+   },
+   "started_at": 1792690879.133,
+   "ends_at": 1792690894.133,
+   "ended_at": 1792690894.133,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20005,
+    "x": -40.7,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  },
+  {
+   "id": "hz-8",
+   "type": "perception_dropout",
+   "where": "world",
+   "params": {
+    "duration_s": 2
+   },
+   "started_at": 1792690792.916,
+   "ends_at": 1792690794.916,
+   "ended_at": 1792690794.916,
+   "status": "expired",
+   "result": {
+    "until": 1792690794.918343
+   }
+  },
+  {
+   "id": "hz-7",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 45,
+    "duration_s": 15,
+    "object": "vehicle"
+   },
+   "started_at": 1792690789.996,
+   "ends_at": 1792690804.996,
+   "ended_at": 1792690804.996,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20004,
+    "x": -40.7,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  },
+  {
+   "id": "hz-6",
+   "type": "cut_in",
+   "where": "world",
+   "params": {
+    "ahead_m": 28,
+    "side": "auto",
+    "speed_factor": 0.4,
+    "delay_s": 1,
+    "change_s": 2.5,
+    "duration_s": 25
+   },
+   "started_at": 1792690752.73,
+   "ends_at": 1792690777.73,
+   "ended_at": 1792690777.73,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 30003,
+    "x": -50.43,
+    "y": 4.33,
+    "heading": -3.139
+   }
+  },
+  {
+   "id": "hz-5",
+   "type": "cut_in",
+   "where": "world",
+   "params": {
+    "ahead_m": 28,
+    "side": "auto",
+    "speed_factor": 0.4,
+    "delay_s": 1,
+    "change_s": 2.5,
+    "duration_s": 25
+   },
+   "started_at": 1792690711.365,
+   "ends_at": 1792690736.365,
+   "ended_at": 1792690736.365,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 30002,
+    "x": -53.37,
+    "y": 4.32,
+    "heading": -3.139
+   }
+  },
+  {
+   "id": "hz-4",
+   "type": "cut_in",
+   "where": "world",
+   "params": {
+    "ahead_m": 28,
+    "side": "auto",
+    "speed_factor": 0.4,
+    "delay_s": 1,
+    "change_s": 2.5,
+    "duration_s": 25
+   },
+   "started_at": 1792690669.804,
+   "ends_at": 1792690694.804,
+   "ended_at": 1792690694.804,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 30001,
+    "x": -52.58,
+    "y": 4.32,
+    "heading": -3.139
+   }
+  },
+  {
+   "id": "hz-3",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 35,
+    "duration_s": 12,
+    "object": "vehicle"
+   },
+   "started_at": 1792690096.51,
+   "ends_at": 1792690108.51,
+   "ended_at": 1792690108.51,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20003,
+    "x": -41.3,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  },
+  {
+   "id": "hz-2",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 35,
+    "duration_s": 12,
+    "object": "vehicle"
+   },
+   "started_at": 1792690018.282,
+   "ends_at": 1792690030.282,
+   "ended_at": 1792690030.282,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20002,
+    "x": -41.3,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  },
+  {
+   "id": "hz-1",
+   "type": "phantom_obstacle",
+   "where": "world",
+   "params": {
+    "ahead_m": 35,
+    "duration_s": 12,
+    "object": "vehicle"
+   },
+   "started_at": 1792689939.831,
+   "ends_at": 1792689951.831,
+   "ended_at": 1792689951.831,
+   "status": "expired",
+   "result": {
+    "obstacle_id": 20001,
+    "x": -39.8,
+    "y": 0.9,
+    "heading": 3.142
+   }
+  }
+ ]
+}

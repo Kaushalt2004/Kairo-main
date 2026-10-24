@@ -1,0 +1,14 @@
+name: town05_demo_traffic_hazards
+description: Demo drive with traffic, a stalled car, a perception dropout and a short telemetry dropout (used to record the mock gateway's session)
+start: map_start
+destination: {x: -155.5, y: -91.7}
+cruise_kph: 30
+timeout_s: 240
+traffic: {count: 8, radius_m: 150, seed: 7}
+hazards:
+  - {at_s: 8, type: phantom_obstacle, ahead_m: 35, duration_s: 12}
+  - {at_s: 30, type: perception_dropout, duration_s: 2}
+  - {at_s: 45, type: telemetry_dropout, duration_s: 3}
+expect:
+  forbid: [R11]
+repeat: 1

@@ -1,0 +1,11 @@
+name: town05_corner_traffic
+description: Two-corner route with 8 simulated vehicles driving around the car
+start: map_start
+destination: {x: -155.5, y: -91.7}
+cruise_kph: 30
+timeout_s: 240
+traffic: {count: 8, radius_m: 150, seed: 1}
+expect:
+  verdict: PASS
+  forbid: [R11]
+repeat: 5
