@@ -135,6 +135,8 @@ class SimVehicle(object):
         self.expires_at = None
         self.hazard_id = None
         self.pending = None         # scripted action (cut-in lane change)
+        self.stopped_since = None   # when it last came to a standstill
+        self.near_ego_since = None  # close to a stopped ego car since
 
     @property
     def static(self):
@@ -164,6 +166,7 @@ class TrafficSim(object):
         self._thread = None
         self._was_active = False
         self._last_keep_near = 0.0
+        self._paths = {}
 
     # ---- public commands (called from the daemon's request threads) ------
 
@@ -289,14 +292,14 @@ class TrafficSim(object):
                 continue
             if ego and math.hypot(x - ego[0], y - ego[1]) < 25.0:
                 continue
-            if any(math.hypot(x - o.x, y - o.y) < 15.0 for o in self.vehicles.values()):
+            if any(math.hypot(x - o.x, y - o.y) < 30.0 for o in self.vehicles.values()):
                 continue
             v = self._new('traffic')
             v.lane, v.s = lane, s
             limit = self.map_cache.speed_limits.get(lane) or DEFAULT_SPEED_MPS
             v.v_des = max(4.0, min(limit, 14.0) * self.rng.uniform(0.6, 0.95)
                           * self.config['speed_factor'])
-            v.v = v.v_des * 0.5
+            v.v = v.v_des * 0.3
             v.x, v.y, v.heading = x, y, h
             self.vehicles[v.id] = v
             return v
@@ -409,24 +412,47 @@ class TrafficSim(object):
                 fwd, lat = self._rel(v, o.x, o.y)
                 if 0 < fwd < LOOK_AHEAD_M and abs(lat) < 1.6:
                     best = min(best, (fwd - (v.length + o.length) / 2, 0.0))
+        samples = self._paths.get(v.id) or []
         if ego:
             fwd, lat = self._rel(v, ego[0], ego[1])
             if 0 < fwd < LOOK_AHEAD_M and abs(lat) < EGO_LATERAL_M:
                 best = min(best, (fwd - (v.length + EGO_LENGTH) / 2, ego[3]))
-            hit = self._ego_on_path(v, ego)
+            hit = self._box_on_path(v, samples, ego[0], ego[1], ego[2], EGO_LENGTH, EGO_WIDTH)
             if hit is not None:
                 best = min(best, (hit - v.length / 2 - 1.0, ego[3]))
+        # Other simulated vehicles crossing or merging into v's path (the
+        # lane-following check above only sees vehicles on the same lanes).
+        for o in self.vehicles.values():
+            if o is v or o.lane is None:
+                continue
+            if math.hypot(o.x - v.x, o.y - v.y) > PATH_CHECK_M + o.length:
+                continue
+            fwd, lat = self._rel(v, o.x, o.y)
+            if 0 < fwd < 15.0 and abs(lat) < (v.width + o.width) / 2 + 0.5:
+                # Anything right in front, whatever lane it is on.
+                best = min(best, (fwd - (v.length + o.length) / 2, 0.0))
+                continue
+            conflict = self._conflict(samples, self._paths.get(o.id) or [])
+            if conflict is not None:
+                mine, theirs = conflict
+                # Paths cross ahead: whoever is farther from the crossing
+                # yields (ties: the lower id goes first).
+                if mine > theirs + 1.0 or (abs(mine - theirs) <= 1.0 and v.id > o.id):
+                    best = min(best, (mine - v.length / 2 - 3.0, 0.0))
+            hit = self._box_on_path(v, samples, o.x, o.y, o.heading, o.length, o.width)
+            if hit is None:
+                continue
+            # Both standing in each other's way: the lower id goes first.
+            if v.id < o.id and v.v < 0.5 and o.v < 0.5 and self._box_on_path(
+                    o, self._paths.get(o.id) or [], v.x, v.y, v.heading,
+                    v.length, v.width) is not None:
+                continue
+            best = min(best, (hit - v.length / 2 - 1.0, o.v))
         return best
 
-    def _ego_on_path(self, v, ego):
-        """Distance along v's lane path to the first point where the path
-        comes within half a car width of the ego's footprint (curved paths
-        through junctions, which a straight look-ahead misses)."""
-        ex, ey, eh = ego[0], ego[1], ego[2]
-        if math.hypot(ex - v.x, ey - v.y) > PATH_CHECK_M + EGO_LENGTH:
-            return None
-        c, s = math.cos(eh), math.sin(eh)
-        clearance = v.width / 2 + 0.4
+    def _path_samples(self, v):
+        """(distance, x, y) every 1.5 m along v's lane path, PATH_CHECK_M ahead."""
+        out = []
         dist, step = 0.0, 1.5
         lane_i, lanes, ls = 0, [v.lane] + v.plan, v.s
         while dist < PATH_CHECK_M:
@@ -434,14 +460,41 @@ class TrafficSim(object):
             dist += step
             while ls > self.geo.length(lanes[lane_i]):
                 if lane_i + 1 >= len(lanes):
-                    return None
+                    return out
                 ls -= self.geo.length(lanes[lane_i])
                 lane_i += 1
             px, py, _ = self.geo.pose(lanes[lane_i], ls)
-            dx, dy = px - ex, py - ey
+            out.append((dist, px, py))
+        return out
+
+    @staticmethod
+    def _conflict(mine, theirs):
+        """(my distance, their distance) to the first point where two paths
+        come within 2.5 m of each other while heading different ways
+        (crossing or merging); None if they don't meet."""
+        for i, (d1, x1, y1) in enumerate(mine):
+            for j, (d2, x2, y2) in enumerate(theirs):
+                if abs(x1 - x2) < 2.5 and abs(y1 - y2) < 2.5:
+                    # Same-lane followers share points from the start; the
+                    # lane check handles them.
+                    if i == 0 and j == 0:
+                        return None
+                    return d1, d2
+        return None
+
+    @staticmethod
+    def _box_on_path(v, samples, bx, by, bh, length, width):
+        """Distance along v's path to the first sample within half a car
+        width of a footprint (centre bx, by, heading bh); None if clear."""
+        if not samples or math.hypot(bx - v.x, by - v.y) > PATH_CHECK_M + length:
+            return None
+        c, s = math.cos(bh), math.sin(bh)
+        clearance = v.width / 2 + 0.4
+        for dist, px, py in samples:
+            dx, dy = px - bx, py - by
             lx, ly = dx * c + dy * s, -dx * s + dy * c
-            out_x = max(abs(lx) - EGO_LENGTH / 2, 0.0)
-            out_y = max(abs(ly) - EGO_WIDTH / 2, 0.0)
+            out_x = max(abs(lx) - length / 2, 0.0)
+            out_y = max(abs(ly) - width / 2, 0.0)
             if math.hypot(out_x, out_y) < clearance:
                 return dist
         return None
@@ -465,6 +518,8 @@ class TrafficSim(object):
         for v in self.vehicles.values():
             if v.lane is not None:
                 by_lane.setdefault(v.lane, []).append(v)
+        self._paths = {v.id: self._path_samples(v) for v in self.vehicles.values()
+                       if v.lane is not None}
 
         for v in list(self.vehicles.values()):
             if v.lane is None:
@@ -490,6 +545,29 @@ class TrafficSim(object):
                 accel = IDM_ACCEL * (free - (s_star / gap) ** 2 if gap < 1e6 else free)
                 accel = max(-MAX_BRAKE, min(IDM_ACCEL, accel))
             v.v = max(0.0, v.v + accel * dt)
+            # Standoff breaker: our car stopped with a simulated vehicle close
+            # by (each waiting for the other, even if it still creeps): the
+            # vehicle leaves the road after 3 s and respawns elsewhere.
+            if v.kind == 'traffic' and ego and ego[3] < 0.5 and                     math.hypot(v.x - ego[0], v.y - ego[1]) < 12.0:
+                v.near_ego_since = v.near_ego_since or now
+                if now - v.near_ego_since > 3.0:
+                    del self.vehicles[v.id]
+                    continue
+            else:
+                v.near_ego_since = None
+            if v.v < 0.1:
+                v.stopped_since = v.stopped_since or now
+                waited = now - v.stopped_since
+                # Deadlock breakers: a vehicle standing next to a stopped ego
+                # car (each waiting for the other) leaves the road, and so
+                # does any vehicle stuck for half a minute; _keep_near
+                # spawns a replacement elsewhere.
+                near_ego = ego and ego[3] < 0.2 and math.hypot(v.x - ego[0], v.y - ego[1]) < 10.0
+                if v.kind == 'traffic' and ((near_ego and waited > 4.0) or waited > 30.0):
+                    del self.vehicles[v.id]
+                    continue
+            else:
+                v.stopped_since = None
             v.s += v.v * dt
             if v.d_rate:
                 step = v.d_rate * dt

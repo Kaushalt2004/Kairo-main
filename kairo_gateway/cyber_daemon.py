@@ -922,6 +922,34 @@ class Daemon(object):
     def cmd_hazard_stop(self, req):
         return self.traffic.stop_hazard(req['hazard_id'])
 
+    def cmd_snap_candidates(self, req):
+        """Nearest point on each distinct lane within radius, closest first
+        (fallback destinations when routing to the nearest lane fails)."""
+        self.map_cache.ensure()
+        x, y = float(req['x']), float(req['y'])
+        radius = float(req.get('radius', 20.0))
+        best = {}
+        for lane_id, (x0, y0, x1, y1) in self.map_cache.lane_boxes.items():
+            if x < x0 - radius or x > x1 + radius or y < y0 - radius or y > y1 + radius:
+                continue
+            pts = self.map_cache.lanes[lane_id]
+            # Stay off the very ends of a lane (junction stubs route badly).
+            for i in range(len(pts) - 1):
+                ax, ay = pts[i]
+                bx, by = pts[i + 1]
+                dx, dy = bx - ax, by - ay
+                seg2 = dx * dx + dy * dy
+                if seg2 == 0:
+                    continue
+                t = max(0.0, min(1.0, ((x - ax) * dx + (y - ay) * dy) / seg2))
+                px, py = ax + t * dx, ay + t * dy
+                d = math.hypot(px - x, py - y)
+                if d <= radius and (lane_id not in best or d < best[lane_id]['distance']):
+                    best[lane_id] = {'x': round(px, 2), 'y': round(py, 2),
+                                     'heading': round(math.atan2(dy, dx), 4),
+                                     'lane_id': lane_id, 'distance': round(d, 2)}
+        return sorted(best.values(), key=lambda c: c['distance'])[:int(req.get('limit', 6))]
+
     def cmd_map_lanes(self, _req):
         payload = self.map_cache.ensure()
         if payload is None:

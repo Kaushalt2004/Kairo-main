@@ -328,3 +328,51 @@ def test_summary_and_markdown(tmp_path):
     assert s["scenarios"][1]["verdicts"] == {"ERROR": 1}
     md = scn.markdown(s)
     assert "| a | 2 | 1/2 (50 %)" in md
+
+
+# ---- V2V ---------------------------------------------------------------------------
+
+from kairo_gateway.v2v import V2VChannel  # noqa: E402
+
+
+def test_v2v_delivery_latency_and_filtering():
+    clock = Clock(100.0)
+    ch = V2VChannel(clock=clock, seed=1)
+    ch.configure(latency_ms=200, loss_p=0.0, range_m=300)
+    pose = {"x": 0.0, "y": 0.0, "heading": 0.0}
+    stalled = {"id": 20001, "x": 60.0, "y": 0.5, "heading": 0.0, "speed": 0.0}
+    behind = {"id": 20002, "x": -40.0, "y": 0.0, "heading": 0.0, "speed": 0.0}
+    far = {"id": 20003, "x": 400.0, "y": 0.0, "heading": 0.0, "speed": 0.0}
+    moving = {"id": 10001, "x": 30.0, "y": 0.0, "heading": 0.0, "speed": 8.0}
+    ch.step(pose, 10.0, [stalled, behind, far, moving])
+    assert ch.alerts == {}                       # still in flight
+    clock.t = 100.3
+    ch.step(pose, 10.0, [stalled, behind, far, moving])
+    s = ch.summary()
+    assert [a["sender_id"] for a in s["alerts"]] == [20001]   # behind/far/moving filtered
+    a = s["alerts"][0]
+    assert a["type"] == "STALLED_VEHICLE" and a["distance_m"] == 60.0
+    assert a["time_to_reach_s"] == 6.0 and 160 <= a["latency_ms"] <= 300
+    assert s["stats"]["out_of_range"] == 1
+    clock.t = 103.0                              # no new messages: alert expires
+    ch.step(pose, 10.0, [])
+    assert ch.summary()["alerts"] == []
+
+
+def test_v2v_loss_and_hard_braking():
+    clock = Clock(0.0)
+    ch = V2VChannel(clock=clock, seed=7)
+    ch.configure(loss_p=0.5, latency_ms=0)
+    pose = {"x": 0.0, "y": 0.0, "heading": 0.0}
+    for k in range(400):
+        clock.t = k * 0.5
+        ch.step(pose, 5.0, [{"id": 20001, "x": 50.0, "y": 0.0, "speed": 0.0}])
+    st = ch.summary()["stats"]
+    assert st["sent"] == 400 and 150 < st["dropped"] < 250
+    assert st["delivered"] == st["sent"] - st["dropped"]
+    ch.configure(loss_p=0.0, latency_ms=0)
+    clock.t = 1000.0
+    ch.step(pose, 5.0, [{"id": 10002, "x": 20.0, "y": 0.0, "speed": 10.0}])
+    clock.t = 1000.5
+    ch.step(pose, 5.0, [{"id": 10002, "x": 23.0, "y": 0.0, "speed": 7.0}])
+    assert ch.summary()["alerts"][0]["type"] == "HARD_BRAKING"

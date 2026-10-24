@@ -37,6 +37,7 @@ from .cyber_bridge import CyberBridge
 from .dreamview import DreamviewClient, DreamviewError
 from .hazards import HazardError, HazardManager
 from .safety import RULES, SafetyValidator
+from .v2v import V2VChannel
 from .vehicle_body import SIGNAL_FIELDS, BodyError, VehicleBody
 
 log = logging.getLogger("kairo.gateway")
@@ -149,6 +150,7 @@ class Gateway:
         self._last_drive_input = 0.0
         self.hazards = HazardManager(self.cyber.request)
         self.safety = SafetyValidator(DATA_DIR / "reports")
+        self.v2v = V2VChannel()
         self._safety_ts: Optional[float] = None  # telemetry sample last validated
 
     # ---- places (per HD map) ---------------------------------------------
@@ -265,6 +267,7 @@ class Gateway:
             "safety": self.safety.live(),
             "hazards": self.hazards.summary(),
             "traffic": t.get("traffic") if self.cyber.connected else None,
+            "v2v": self.v2v.summary(),
             "dreamview": {
                 "mode": hmi.get("current_mode"),
                 "modes": hmi.get("modes") or [],
@@ -357,7 +360,7 @@ class Gateway:
         }
 
     STUCK_AFTER_S = 4.0
-    MAX_REROUTES = 2
+    MAX_REROUTES = 3
 
     async def _reroute(self) -> None:
         """Re-sends the current destination so Apollo plans a fresh route
@@ -373,6 +376,22 @@ class Gateway:
         if self.target_speed_kph:
             args["target_speed"] = self.target_speed_kph / 3.6
         try:
+            if self._reroutes >= self.MAX_REROUTES and self._last_xy and not self.manual:
+                # Last attempt: the car may have drifted off its lane or sit on a
+                # broken lane link. Put it back on the nearest lane, facing the
+                # lane's way, so planning has a valid start, then route again.
+                pose = (self.cyber.telemetry or {}).get("pose") or {}
+                lane = await self.cyber.request(
+                    "snap", timeout=15, x=self._last_xy[0], y=self._last_xy[1],
+                    radius=15, heading=pose.get("heading"))
+                if self.destination is not dest:
+                    return  # the trip was ended or replaced meanwhile
+                if lane:
+                    await self.dreamview.set_start_point(lane["x"], lane["y"], lane["heading"])
+                    await asyncio.sleep(1.0)
+                    log.info("Re-placed the car on lane %s before rerouting", lane.get("lane_id"))
+            if self.destination is not dest:
+                return
             result = await self.cyber.request("lane_follow", timeout=15, **args)
             self._record("REROUTE", result)
         except RuntimeError as e:
@@ -613,12 +632,32 @@ class Gateway:
             await self.set_manual(False)  # engage autopilot from manual
             await asyncio.sleep(0.5)
         await self.ensure_localization()
-        point = await self.snap(req.x, req.y, "drive there")
-        args: Dict[str, Any] = {"x": point["x"], "y": point["y"],
-                                "heading": point["heading"]}
-        if req.target_speed_kph:
-            args["target_speed"] = req.target_speed_kph / 3.6
-        result = await self.cyber.request("lane_follow", timeout=15, **args)
+        first = await self.snap(req.x, req.y, "drive there")
+        # Routing fails for some lanes of the converted maps (map edges,
+        # broken lane links): fall back to the next-nearest lanes.
+        try:
+            others = await self.cyber.request("snap_candidates", timeout=15,
+                                              x=req.x, y=req.y, radius=20, limit=6) or []
+        except RuntimeError:
+            others = []
+        candidates = [first] + [c for c in others if c.get("lane_id") != first.get("lane_id")]
+        result, point, last_error = None, None, None
+        for cand in candidates:
+            args: Dict[str, Any] = {"x": cand["x"], "y": cand["y"], "heading": cand["heading"]}
+            if req.target_speed_kph:
+                args["target_speed"] = req.target_speed_kph / 3.6
+            try:
+                result = await self.cyber.request("lane_follow", timeout=15, **args)
+                point = cand
+                break
+            except RuntimeError as e:
+                last_error = e
+                log.info("No route to lane %s, trying the next one", cand.get("lane_id"))
+        if point is None:
+            log.warning("Routing failed for every lane near (%.1f, %.1f): %s",
+                        req.x, req.y, last_error)
+            raise HTTPException(409, "Apollo can't find a route to that spot. "
+                                     "Pick a point in the middle of a road.")
         self.destination = {"x": point["x"], "y": point["y"],
                             "heading": point["heading"],
                             "name": req.name or "Dropped pin"}
@@ -755,6 +794,10 @@ async def safety_loop() -> None:
         await asyncio.sleep(0.1)
         try:
             gw.hazards.tick()
+            t = gw.cyber.telemetry or {}
+            speed = ((t.get("chassis") or {}).get("speed_mps") or 0.0)
+            gw.v2v.step(t.get("pose") if gw._fresh("localization") else None, speed,
+                        (t.get("obstacles") or []) if gw._fresh("perception") else [])
             if not gw.safety.active:
                 continue
             ts = (gw.cyber.telemetry or {}).get("ts")
@@ -1092,6 +1135,27 @@ async def hazards_clear():
     stopped = await gw.hazards.clear()
     broadcaster.kick()
     return {"ok": True, "stopped": [r["id"] for r in stopped]}
+
+
+# ---- simulated V2V -----------------------------------------------------------------------
+
+class V2VConfig(BaseModel):
+    enabled: Optional[bool] = None
+    loss_p: Optional[float] = Field(None, ge=0, le=1)
+    latency_ms: Optional[float] = Field(None, ge=0, le=5000)
+    range_m: Optional[float] = Field(None, gt=0, le=2000)
+
+
+@app.get("/api/v2v")
+def v2v_status():
+    return gw.v2v.summary()
+
+
+@app.post("/api/v2v/config")
+def v2v_config(cfg: V2VConfig):
+    gw.v2v.configure(**cfg.model_dump())
+    broadcaster.kick()
+    return gw.v2v.summary()
 
 
 # ---- safety validation ----------------------------------------------------------------
